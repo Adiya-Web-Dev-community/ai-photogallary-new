@@ -1,13 +1,9 @@
 import "./EventDetailsPage.css";
-import { FiSettings } from "react-icons/fi";
 import { CiEdit } from "react-icons/ci";
 import { ImBin } from "react-icons/im";
 import { useEffect, useState } from "react";
-import { AiOutlineCloudUpload } from "react-icons/ai";
-import dummyImg from "../../assets/fr-gallery-dummyimg.jpg";
-import { Modal, Box, Card, CardMedia, Button } from "@mui/material";
+import { Modal, Box } from "@mui/material";
 import AddVideoLinkModal from "./add-video-link-modal/add-video-link-modal";
-import { useSelector } from "react-redux";
 import axios from "../../helpers/axios";
 import { useParams, useNavigate } from "react-router-dom";
 import AddImageModal from "./add-image-modal/add-image-modal";
@@ -32,6 +28,21 @@ const EventDetailsPage = () => {
   const [allImages, setAllImages] = useState([]);
   const navigate = useNavigate();
 
+  //fetch event details
+  const [eventDetails, setEventDetails] = useState({});
+  const fetchEventDetails = async () => {
+    try {
+      const resp = await axios.get(`/event/${eventId}`);
+      // console.log("data", resp.data.data);
+      setEventDetails(resp.data.data);
+    } catch (error) {
+      console.error("Error fetching event details:", error);
+    }
+  };
+  useEffect(() => {
+    fetchEventDetails();
+  }, []);
+
   const getEventDetails = async () => {
     await axios
       .get(`/event/${eventId}/youtube-links`, {
@@ -47,23 +58,49 @@ const EventDetailsPage = () => {
       });
   };
 
-  const publishEvent = (eventData) => {
-    if (eventData.published == true) {
-      return toast.error("event has already been published !");
+  const handleEventStatus = async () => {
+    let Estatus;
+    if (eventDetails?.status === "published") {
+      Estatus = "unpublished";
+    } else if (eventDetails?.status === "unpublished") {
+      Estatus = "published";
     }
-    axios
-      .patch(`/update-event-publish/${eventId}`)
-      .then((res) => {
-        // console.log(res);
-        if (res.data.success) {
-          toast.success("event updated to published");
-          getEventDetails();
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    console.log(Estatus);
+    try {
+      axios
+        .put(
+          `/event/${eventId}`,
+          { status: Estatus },
+          { headers: { authorization: token } }
+        )
+        .then((res) => {
+          console.log("sattus", res);
+          if (res.data.success) {
+            fetchEventDetails();
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } catch (err) {
+      console.log(err);
+    }
+    fetchEventDetails();
   };
+
+  //delete event
+  const handleDelete = async () => {
+    try {
+      const resp = await axios.delete(`/event/${eventId}`);
+      console.log(resp);
+      if (resp.data.success) {
+        navigate("/all-events-list");
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   const [pageNo, setPageNo] = useState(paginationData?.currentPage || 1);
 
   const getAllThePostImage = async (url) => {
@@ -120,18 +157,6 @@ const EventDetailsPage = () => {
   const handleOpenAddImagesModal = () => setOpenAddImagesModal(true);
   const handleCloseAddImagesModal = () => setOpenAddImagesModal(false);
 
-  const [coverPic, setCoverPic] = useState();
-  const [inputTagDisplay, setInputTagDisplay] = useState("block");
-
-  const editCoverPage = (e) => {
-    setCoverPic(e.target.files[0]);
-    setEventData({
-      ...eventData,
-      eventCoverPage: URL.createObjectURL(e.target.files[0]),
-    });
-    // console.log(URL.createObjectURL(e.target.files[0]));
-  };
-
   useEffect(() => {
     getEventDetails();
     getAllThePostImage();
@@ -145,16 +170,14 @@ const EventDetailsPage = () => {
           <button onClick={handleOpenVideoLinkModal}>Upload Video Link</button>
         </div>
         <div className="event-form-page-header-rb">
-          {/* eventName through redux ==>
-                    <h4>{createEventData.eventName}</h4> */}
           <h4>{eventName}</h4>
           <h4>
             <CiEdit />
           </h4>
         </div>
       </section>
-      <main className="event-form-main-container">
-        <section className="lb">
+      <main className="flex gap-2">
+        <section className="w-[75%]">
           <div className="flex gap-3 px-10 py-2 pb-4">
             <section>
               <button
@@ -170,14 +193,6 @@ const EventDetailsPage = () => {
                 IMAGES
               </button>
             </section>
-            {/* <section>
-                            <button
-                                onClick={() => setContainerRendering('unpublishedImages')}
-                                style={{ backgroundColor: containerRendering == 'unpublishedImages' ? '#f0f0f0' : 'transparent' }}
-                            >
-                                UNPUBLISHED IMAGES
-                            </button>
-                        </section> */}
             <section>
               <button
                 onClick={() => setContainerRendering("videos")}
@@ -237,96 +252,40 @@ const EventDetailsPage = () => {
             </section>
           </div>
         </section>
-        <div
-          style={{
-            border: "1px solid #cccbcb",
-            margin: "10px",
-            width: "440px",
-          }}
-        >
-          <div>
-            <CardMedia
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                flexDirection: "column",
-                padding: "10px",
-              }}
-            >
-              <Card
-                className="cover-pic-preview-image"
-                style={{
-                  height: "250px",
-                  width: "300px",
-                  border: "1px solid #cccbcb",
-                }}
-              ></Card>
-              {/* <img  src={eventData?.eventCoverPage} /> */}
-              {/* <p onClick={() => setCoverPic("")}>
-                                <input id='cover-pic-input' type='file' onChange={editCoverPage} />
-                                <label htmlFor='cover-pic-input'>change cover page 1080 × 1080</label>
-                            </p> */}
-              {/* <Button 
-                              variant='contained'
-                              sx={{
-                            margin:'0px auto'
-                        }} >
-                            change cover page
-                        </Button> */}
-            </CardMedia>
+        <div className="border-2 w-[25%] h-screen ">
+          {/* cover img */}
+          <div className="w-[96%] h-[16rem] m-auto ">
+            <h1 className="font-bold text-center py-2">Cover Image</h1>
+            <img src={eventDetails?.coverImage} className="w-full h-full " />
           </div>
-          <hr></hr>
-          <div>
-            <textarea
-              className="event-form-edit-textarea"
-              placeholder="Edit Maximum 150 Characters"
-            />
-          </div>
-          <hr></hr>
-
-          <div
-            style={{
-              background: "white",
-              width: "300px",
-              padding: "10px",
-              marginBottom: "-50px",
-            }}
-          >
-            <p>
-              Event Code: <span>42485</span>
+          {/* buttons section */}
+          <div className="flex flex-col justify-center items-center gap-3">
+            <p className="mt-5">
+              Event Code: <span>{eventDetails.eventCode}</span>
             </p>
-            {/* <p>copy</p> */}
-          </div>
-          <hr></hr>
 
-          <div>
-            <div style={{ textAlign: "center", marginTop: "10px" }}>
-              <button
-                className="rounded-btns"
-                onClick={() =>
-                  navigate(
-                    `/facerecognitiongallery/${eventName}/${eventName}/share-with-client`
-                  )
-                }
-              >
-                Share with client
-              </button>
-            </div>
-            <div style={{ textAlign: "center", marginTop: "15px" }}>
-              <button className="rounded-btns">Preview</button>
-              <button
-                className="rounded-btns"
-                onClick={() => publishEvent(eventData)}
-              >
-                Publish
-              </button>
-            </div>
-            <div className="delete-event-btn-wrapper">
-              <button className="rounded-btns">
-                Delete Event...?
-                <ImBin />
-              </button>
-            </div>
+            <button
+              className="border-2 w-[15rem] bg-gray-300 rounded-md py-1.5 hover:shadow-lg hover:font-bold bg-gray-200"
+              onClick={() => navigate(`/share-with-client/event/${eventId}`)}
+            >
+              Share with client
+            </button>
+            <button className="border-2 w-[15rem] bg-gray-300 rounded-md py-1.5 hover:shadow-lg hover:font-bold bg-gray-200">
+              Preview
+            </button>
+            <button
+              className="border-2 w-[15rem] bg-gray-300 rounded-md py-1.5 hover:shadow-lg hover:font-bold bg-gray-200 capitalize"
+              onClick={handleEventStatus}
+            >
+              status:{eventDetails?.status}
+            </button>
+            <button
+              className="flex justify-center gap-2 border-2 w-[15rem] bg-gray-300 rounded-md py-1.5 hover:shadow-lg hover:font-bold bg-gray-200"
+              onClick={handleDelete}
+            >
+              <span>Delete Event</span>
+              <ImBin className="mt-1" />
+            </button>
           </div>
         </div>
       </main>

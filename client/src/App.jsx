@@ -13,10 +13,10 @@ import Signin from "./components/signin/Signin";
 //photographer routes
 import DashBoardDetails from "./components/dashboard-details/DashBoardDetails";
 import EventList from "./components/all-event-list/EventList";
-import EventDetailsPage from "./components/event-details-page/EventDetailsPage"; //
+import EventDetailsPage from "./components/event-details-page/EventDetailsPage";
+import ShareWithClient from "./components/Share-with-client/ShareWithClient";
 //customer routes
 import SetupWatermark from "./components/setup-watermark/SetupWatermark";
-import ShareWithClient from "./components/Share-with-client/ShareWithClient";
 import SetPassword from "./components/register-user/set-passsword";
 //public routes- full access  , face search
 import FullEventForm from "./components/full-event-access/FullEventForm/FullEventForm";
@@ -36,22 +36,23 @@ function App() {
             <Route path="/register-new-user" element={<RegisterUser />} />
             {/* <Route path="/set-password" element={<SetPassword />} /> */}
           </Route>
-          <Route element={<Photographer />}>
+          <Route element={<Pho tographer />}>
             <Route path="/dashboard-details" element={<DashBoardDetails />} />
             <Route path="/all-events-list" element={<EventList />} />
             <Route
               path="/event/:eventName/:eventId"
               element={<EventDetailsPage />}
             />
+            <Route
+              path="/share-with-client/event/:id"
+              element={<ShareWithClient />}
+            />
+            <Route path="/display-page" element={<Signin />} />
           </Route>
           {/* 
-        
           <Route path="/gallary/:id" element={<Gallary />} />
           <Route path="/watermaker-setup" element={<SetupWatermark />} />
-          <Route
-            path="/facerecognitiongallery"
-            element={<FaceRecognitionGallery />}
-          />
+         
           <Route
             path="/full-event-access/:eventId"
             element={<FullEventForm />}
