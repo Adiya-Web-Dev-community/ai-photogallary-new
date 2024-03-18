@@ -5,6 +5,7 @@ const AllEventContainer = ({
   allEvents,
   eventRendering,
   handleDeleteEvent,
+  handleUpdateEventStatus,
 }) => {
   console.log("AllEventContainer => ", allEvents);
   return (
@@ -17,6 +18,7 @@ const AllEventContainer = ({
                 event={event}
                 key={event._id}
                 onDelete={handleDeleteEvent}
+                onUpdateStatus={handleUpdateEventStatus}
               />
             );
           })}
