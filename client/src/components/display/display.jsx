@@ -1,16 +1,9 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import axios from "../../helpers/axios";
 
-const Display = () => {
-  const [event, setEventData] = useState(null);
-  const { eventId } = useParams();
-
+const Display = ({ event }) => {
   useEffect(() => {
-    axios.get(`/event/${eventId}`).then((res) => setEventData(res.data.data));
-  }, []);
-  console.log(event);
-
+    window.scrollTo(0, 0);
+  });
   // Function to format event date
   const formatEventDate = (dateString) => {
     const date = new Date(dateString);
@@ -23,7 +16,7 @@ const Display = () => {
   const formattedDate = event?.eventDate
     ? formatEventDate(event?.eventDate)
     : "";
-  console.log(formattedDate.split(" "));
+
   return (
     <div className="container">
       <div className="max-w-3xl mx-auto">
@@ -36,13 +29,11 @@ const Display = () => {
           <div className="w-1/2">
             <div className="w-80 h-auto bg-white p-4 mt-10">
               <img src={event?.coverImage} alt="" className="" />
-              <p className="italic text-center mt-2 text-xl text-gray-600">
-                {event?.eventName}
-              </p>
+              <p className="italic text-center mt-2 text-lg text-gray-600"></p>
             </div>
           </div>
           <div className="w-1/2 flex flex-col justify-evenly ml-14">
-            <div className="italic text-center mt-2 text-4xl text-gray-600">
+            <div className="italic text-center mt-2 text-2xl text-gray-600">
               {event?.eventName}
             </div>
             <div className="flex justify-evenly items-center mt-10 font-black text-2xl align-middle">
@@ -57,8 +48,9 @@ const Display = () => {
         <div className="flex flex-col item-center justify-center bg-gray-100 text-center px-10 pb-16">
           <p className="font-semibold">Venue- </p>
           <p className="font-semibold">
-            Badi-Gorela-Mulla Talai Rd, Haridas Ji Ki Magri, <br />
-            Pichola, Udaipur, Rajasthan 313001
+            {event?.venue ||
+              `Badi-Gorela-Mulla Talai Rd, Haridas Ji Ki Magri
+            Pichola, Udaipur, Rajasthan 313001`}
           </p>
         </div>
       </div>
