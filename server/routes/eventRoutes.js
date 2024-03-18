@@ -9,9 +9,6 @@ const {
   addEvent,
   updateEvent,
   deleteEvent,
-  addSubEvent,
-  getSubEvent,
-  deleteSubEvent,
   addYoutubeLinks,
   getYoutubeLinks,
   updateYoutubeLinks,
@@ -35,16 +32,15 @@ router.get("/event/:id", getEvent);
 router.post("/event", middleware, addEvent);
 
 // Create a sub event
-router.post("/subevent/:id", middleware, addSubEvent);
 
 // Update a event
 router.put("/event/:id", middleware, updateEvent);
 
 // Get a subevent
-router.get("/subevent/:id", middleware, getSubEvent);
+
 
 // Delete a subevent
-router.delete("/subevent/:id", middleware, deleteSubEvent);
+
 
 // // Fetech all sub events
 // router.get("/subevents/:id", middleware, getAllSubEvents)

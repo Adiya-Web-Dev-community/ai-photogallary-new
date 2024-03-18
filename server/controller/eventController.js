@@ -1,6 +1,9 @@
 const DashBoard = require("../models/dashboard");
 const Event = require("../models/event");
 const User = require("../models/user");
+const fs = require("fs");
+const path = require("path");
+
 const generateOTP = require("../helpers/otpHelper.js").generateOTP;
 const {
     eventConfirmation,
@@ -24,7 +27,7 @@ const getEvents = async (req, res) => {
             query.status = status;
         }
 
-        const events = await Event.find(query)
+        const events = await Event.find(query).sort({ createdAt: -1 });
 
         return res.status(200).json({
             message: "Events fetched successfully",
@@ -32,6 +35,8 @@ const getEvents = async (req, res) => {
             data: events,
         });
     } catch (error) {
+        console.log(error);
+
         return res.status(500).json({
             message: error.message,
             success: false,
@@ -44,12 +49,7 @@ const getEvent = async (req, res) => {
     try {
         const user = await User.findById(req.accountId);
 
-        const event = await Event.findById(req.params.id).populate({
-            path: "subEvents",
-            populate: {
-                path: "subEvents",
-            },
-        });
+        const event = await Event.findById(req.params.id);
 
         return res.status(200).json({
             message: "Event fetched successfully",
@@ -66,7 +66,6 @@ const getEvent = async (req, res) => {
 
 // To add an event
 const addEvent = async (req, res) => {
-    console.log(req.body)
     try {
         const userid = req.accountId;
         const user = await User.findById(userid).populate({
@@ -77,18 +76,23 @@ const addEvent = async (req, res) => {
             ...req.body,
             dashboardId: user.dashboardId,
         });
+
         let faceSearchLink = `http://localhost:5173/face-search/event/${event._id}`;
         let link = `http://localhost:5173/full-event-access/${event._id}`;
         event.link = link;
         event.faceSearchLink = faceSearchLink;
         const qrCode = await QRCode.toDataURL(link);
         const faceQrCode = await QRCode.toDataURL(faceSearchLink);
-        event.faceQrCode = faceQrCode
+        event.faceQrCode = faceQrCode;
         event.qrCode = qrCode;
 
-        event.fullAccessPin = generateOTP()
-        event.faceSearchPin = generateOTP()
+        event.fullAccessPin = generateOTP();
+        event.faceSearchPin = generateOTP();
 
+        // Creating folder for database
+        const databaseDir = path.join(__dirname, "..", "..", "database");
+        const eventDir = path.join(databaseDir, "events", event._id.toString());
+        fs.mkdirSync(eventDir);
 
         await event.save();
         eventConfirmation(
@@ -98,7 +102,7 @@ const addEvent = async (req, res) => {
             event.qrCode,
             event.link,
             event.faceSearchLink,
-            event.faceQrCode,
+            event.faceQrCode
         );
 
         return res.status(200).json({
@@ -107,43 +111,9 @@ const addEvent = async (req, res) => {
             event,
         });
     } catch (error) {
+        console.log(error);
         return res.status(500).json({
             message: "Failed to add event",
-            success: false,
-        });
-    }
-};
-
-// Create a sub events for a event
-
-const addSubEvent = async (req, res) => {
-    try {
-        const userid = req.accountId;
-        const user = await User.findById(userid); /*.populate({
-            path: "dashboardId"
-        })*/
-        if (!user) {
-            return res.status(404).json({
-                message: "User not found",
-                success: false,
-            });
-        }
-        const event = await Event.findById(req.params.id);
-        const subEvent = await Event.create({
-            ...req.body,
-            isSubEvents: true,
-            dashboardId: user.dashboardId,
-            parentEvent: req.params.id,
-        });
-        event.subEvents.push(subEvent);
-        await event.save();
-        return res.status(200).json({
-            message: "Sub event added successfully",
-            success: true,
-        });
-    } catch (error) {
-        return res.status(500).json({
-            message: "Failed to add sub event",
             success: false,
         });
     }
@@ -190,51 +160,6 @@ const deleteEvent = async (req, res) => {
     } catch (error) {
         return res.status(500).json({
             message: "Failed to delete event",
-            success: false,
-        });
-    }
-};
-
-// To get a sub event {passing sub event id}
-const getSubEvent = async (req, res) => {
-    try {
-        const event = await Event.findById(req.params.id);
-        if (!event) {
-            return res.status(404).json({
-                message: "Event not found",
-            });
-        }
-        return res.status(200).json({
-            message: "Event fetched successfully",
-            success: true,
-            data: event,
-        });
-    } catch (error) {
-        return res.status(500).json({
-            message: "Something went wrong",
-            success: false,
-        });
-    }
-};
-
-// To delete a sub event {passing sub event id}
-const deleteSubEvent = async (req, res) => {
-    try {
-        const event = await Event.findByIdAndDelete(req.params.id);
-        if (!event) {
-            return res.status(404).json({
-                message: "Event not found",
-                success: false,
-            });
-        }
-
-        return res.status(200).json({
-            message: "Event deleted successfully",
-            success: true,
-        });
-    } catch (error) {
-        return res.status(500).json({
-            message: "Something went wrong",
             success: false,
         });
     }
@@ -416,7 +341,7 @@ const deleteImages = async (req, res) => {
 };
 
 const getImagesArray = async (req, res) => {
-    console.log("query", req.query)
+    console.log("query", req.query);
     try {
         const eventId = req.params.id;
         const event = await Event.findById(eventId);
@@ -515,7 +440,6 @@ async function addWatermarkToImage(imageUrl, watermarkUrl) {
 
 const sendEmails = async (req, res) => {
     try {
-
         const eventId = req.params.id;
         const event = await Event.findById(eventId);
 
@@ -533,9 +457,9 @@ const sendEmails = async (req, res) => {
 };
 
 const pinValidate = async (req, res) => {
-    console.log(req.body)
+    console.log(req.body);
     try {
-        console.log(req.params.id)
+        console.log(req.params.id);
         const eventId = req.params.id;
 
         const event = await Event.findById(eventId);
@@ -556,15 +480,13 @@ const pinValidate = async (req, res) => {
                 },
             });
         } else {
-
             return res.status(400).json({ error: "Invalid pin" });
         }
     } catch (error) {
-        console.log(error)
+        console.log(error);
         return res.status(500).json({ error: "Internal Server Error" });
     }
 };
-
 
 const getClientImagesArray = async (req, res) => {
     try {
@@ -596,7 +518,6 @@ const getClientImagesArray = async (req, res) => {
     }
 };
 
-
 const getClientYoutubeLinks = async (req, res) => {
     try {
         const eventId = req.params.id;
@@ -614,15 +535,151 @@ const getClientYoutubeLinks = async (req, res) => {
     }
 };
 
+// Get all folder name
+function getFolderNamesInDirectory(directoryPath) {
+    try {
+        const filesAndFolders = fs.readdirSync(directoryPath);
+
+        const folderNames = filesAndFolders.filter((item) => {
+            const itemPath = path.join(directoryPath, item);
+            return fs.statSync(itemPath).isDirectory();
+        });
+
+        return folderNames;
+    } catch (error) {
+        console.error(error);
+        return [];
+    }
+}
+
+// Create new image category folder in dir
+const createNewImageCategory = async (req, res) => {
+    try {
+        const eventId = req.params.id;
+        const event = await Event.findById(eventId);
+        const eventDirectory = path.join(
+            __dirname,
+            "..",
+            "..",
+            "database",
+            "events",
+            `${event._id}`
+        );
+
+        if (!fs.existsSync(eventDirectory)) {
+            return res.status(404).json({ error: "Event directory not found" });
+        }
+
+        const existingFolders = getFolderNamesInDirectory(eventDirectory);
+
+        const category = req.body.category;
+        if (existingFolders.includes(category)) {
+            return res.status(400).json({ error: "Category already exists" });
+        }
+
+        const categoryDirectory = path.join(eventDirectory, category);
+        fs.mkdirSync(categoryDirectory);
+
+        return res
+            .status(200)
+            .json({ message: "Category created successfully" });
+    } catch (error) {
+        return res.status(500).json({ error: "Internal Server Error" });
+    }
+};
+
+// Get all images catgeory folders
+const getImagesCategories = async (req, res) => {
+    try {
+        const eventId = req.params.id;
+        const event = await Event.findById(eventId);
+        const eventDirectory = path.join(
+            __dirname,
+            "..",
+            "..",
+            "database",
+            "events",
+            `${event._id}`
+        );
+
+        if (!fs.existsSync(eventDirectory)) {
+            return res.status(404).json({ error: "Event directory not found" });
+        }
+        const existingFolders = getFolderNamesInDirectory(eventDirectory);
+        return res
+            .status(200)
+            .json({ message: "Category created successfully" });
+    } catch (error) {
+        return res.status(500).json({ error: "Internal Server Error" });
+    }
+};
+
+// Delete Image Category
+const deleteImageCategory = async (req, res) => {
+    try {
+        const eventId = req.params.id;
+        const event = await Event.findById(eventId);
+        if (!event) {
+            return res.status(404).json({ error: "Event not found" });
+        }
+
+        // Directory path for the event
+        const eventDirectory = path.join(
+            __dirname,
+            "..",
+            "..",
+            "database",
+            "events",
+            `${event._id}`
+        );
+
+        if (!fs.existsSync(eventDirectory)) {
+            return res.status(404).json({ error: "Event directory not found" });
+        }
+
+        const category = req.body.category;
+
+        const categoryDirectory = path.join(eventDirectory, category);
+
+        if (!fs.existsSync(categoryDirectory)) {
+            return res
+                .status(404)
+                .json({ error: "Category directory not found" });
+        }
+
+        deleteFolder(categoryDirectory);
+
+        return res
+            .status(200)
+            .json({ message: "Category deleted successfully" });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ error: "Internal Server Error" });
+    }
+};
+const deleteFolder = (folderPath) => {
+    try {
+        if (fs.existsSync(folderPath)) {
+            fs.rmdirSync(folderPath, { recursive: true });
+            console.log(`Folder deleted: ${folderPath}`);
+        } else {
+            console.log(`Folder does not exist: ${folderPath}`);
+        }
+    } catch (error) {
+        console.error(`Error deleting folder: ${error}`);
+    }
+};
+
+
+
+
+
 module.exports = {
     getEvents,
     getEvent,
     addEvent,
     updateEvent,
     deleteEvent,
-    addSubEvent,
-    getSubEvent,
-    deleteSubEvent,
     addYoutubeLinks,
     getYoutubeLinks,
     updateYoutubeLinks,
@@ -635,5 +692,4 @@ module.exports = {
     getClientImagesArray,
     pinValidate,
     getClientYoutubeLinks,
-
 };
