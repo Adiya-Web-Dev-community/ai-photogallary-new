@@ -72,7 +72,11 @@ const EventList = () => {
 
   const handleDeleteEvent = async (eventId) => {
     try {
-      await axios.delete(`/event/${eventId}`);
+      await axios.delete(`/event/${eventId}`, {
+        headers: {
+          authorization: token,
+        },
+      });
       // Remove the deleted event from the events list
       setAllEvents(allEvents.filter((event) => event._id !== eventId));
       console.log("Event deleted successfully");
