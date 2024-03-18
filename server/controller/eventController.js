@@ -48,9 +48,7 @@ const getEvents = async (req, res) => {
 const getEvent = async (req, res) => {
     try {
         const user = await User.findById(req.accountId);
-
         const event = await Event.findById(req.params.id);
-
         return res.status(200).json({
             message: "Event fetched successfully",
             success: true,
@@ -60,6 +58,7 @@ const getEvent = async (req, res) => {
         return res.status(500).json({
             message: "Something went wrong",
             success: false,
+            msg: error.message
         });
     }
 };
@@ -126,7 +125,7 @@ const updateEvent = async (req, res) => {
         const user = await User.findById(userid);
 
         const event = await Event.findByIdAndUpdate(
-            req.params.eventId,
+            req.params.id,
             {
                 ...req.body,
             },

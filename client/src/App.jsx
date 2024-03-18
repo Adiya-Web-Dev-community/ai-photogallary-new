@@ -49,20 +49,20 @@ function App() {
               path="/share-with-client/event/:id"
               element={<ShareWithClient />}
             />
-            
           </Route>
+          {/* full access */}
+          <Route path="/full-event-access/:id" element={<FullEventForm />} />
+          <Route path="/show-event-data/:id" element={<Event />} />
+          {/* face search */}
+          <Route path="/face-search/event/:id" element={<FaceSearch />} />
           {/* 
           <Route path="/gallary/:id" element={<Gallary />} />
           <Route path="/watermaker-setup" element={<SetupWatermark />} />
          
-          <Route
-            path="/full-event-access/:eventId"
-            element={<FullEventForm />}
-          />
-          <Route path="/show-event-data/:eventId" element={<Event />} />
+          
       
           <Route
-            path="/face-search/event/:eventId"
+            path="/face-search/event/:id"
             element={<EventAccessForm />}
           /> */}
         </Routes>

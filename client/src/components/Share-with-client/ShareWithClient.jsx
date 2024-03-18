@@ -1,37 +1,58 @@
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import "./ShareWithClient.css";
 import Switch from "@mui/material/Switch";
-import React, { useState, useEffect } from "react";
 import { MdOutlineArrowBackIosNew } from "react-icons/md";
 import { FiSettings } from "react-icons/fi";
-import dummyImg from "../../assets/fr-gallery-dummyimg.jpg";
 import axios from "../../helpers/axios";
 import { useParams } from "react-router-dom";
+//copy link
+import copy from "clipboard-copy";
+import toast from "react-hot-toast";
 
 const FaceRecognitionGallery = () => {
+  const { id } = useParams();
+  const token = localStorage.getItem("token");
+  const navigate = useNavigate();
+  const [eventData, setEventData] = useState({});
   const [form, setForm] = useState({
-    fullEventAccess: false,
-    faceSearc: false,
-    clientEmail: false,
-    fullAccessQr: "",
-    faceSearchQr: "",
+    fullEventAccess: true,
+    faceSearchAccess: true,
+    clientEmail: true,
+    shareWithCients: false,
   });
+
+  //client emmails
+  const [clientEmail, setClientEmail] = useState("");
+  const [clientEmailArr, setClientEmailArr] = useState([]);
+  const addClientEmail = () => {
+    if (!clientEmail) {
+      return toast.error("Please add client email");
+    }
+    if (clientEmailArr.find((email) => email === clientEmail)) {
+      return toast.error("Client email already added");
+    }
+    setClientEmail("");
+    setClientEmailArr([...clientEmailArr, clientEmail]);
+  };
+  useEffect(() => {
+    console.log(clientEmailArr, clientEmailArr.length);
+  }, [addClientEmail]);
 
   const handleChange = (event) => {
     setForm({ ...form, [event.target.name]: event.target.checked });
   };
 
-  const { eventName } = useParams();
-  const token = localStorage.getItem("token");
-
   const getEventDetails = async () => {
     await axios
-      .get(`/event/${eventName}`, {
+      .get(`/event/${id}`, {
         headers: {
           authorization: token,
         },
       })
       .then((res) => {
-        console.log(res.data);
+        console.log(res.data.data);
+        setEventData(res.data.data);
       })
       .catch((error) => {
         console.log(error);
@@ -42,81 +63,107 @@ const FaceRecognitionGallery = () => {
     getEventDetails();
   }, []);
 
+  //copy links
+  const [fullAccessLinkCopied, setFullAccessLinkCopied] = useState(false);
+  const [faceSearchLinkCopied, setFaceSearchLinkCopied] = useState(false);
+  const copyFullAccessLink = () => {
+    setFaceSearchLinkCopied(false);
+    copy(eventData?.link);
+    setFullAccessLinkCopied(true);
+    setTimeout(() => {
+      setFullAccessLinkCopied(false);
+    }, 2000); // Reset 'copied' state after 2 seconds
+  };
+  const copyFaceSearchLink = () => {
+    setFullAccessLinkCopied(false);
+    copy(eventData?.link);
+    setFaceSearchLinkCopied(true);
+    setTimeout(() => {
+      setFaceSearchLinkCopied(false);
+    }, 2000); // Reset 'copied' state after 2 seconds
+  };
+
+  //handle save
+  const handleSave = async () => {
+    try {
+      const res = await axios.put(`/event/${id}`, form, {
+        headers: {
+          authorization: token,
+        },
+      });
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   return (
     <div className="fr-gallery-wrapper  ">
       <section className="fr-gallery-header ">
         <div className="fr-gallery-header-lb">
-          <button>
+          <button
+            onClick={() => navigate(`/event/${eventData.eventName}/${id}`)}
+          >
             <MdOutlineArrowBackIosNew />
           </button>
           <button>Share with client</button>
         </div>
-        <div className="fr-gallery-header-rb">
-          <button>
-            <span>
-              <FiSettings />
-            </span>
+        <div className="rounded-full border-2 border-gray-300 px-3 py-1 shadow-lg">
+          <button className="flex gap-2 px-3">
+            <FiSettings className="mt-1" />
             <span>Dashboard Settings</span>
           </button>
         </div>
       </section>
-      <section className="fr-gallery-main ">
-        <div className="fr-gallery-main-lb">
-          <h6>WHATSAPP / EMAIL PREVIEW</h6>
-          <div className="fr-gallery-main-lb-img-container">
-            <img src={dummyImg} alt="userImg" />
+      <section className="mt-2 flex py-10 gap-10  justify-between w-[90%] m-auto h-[40rem]">
+        <div className="flex gap-[6rem] flex-col border-r-4">
+          <div className="flex flex-col px-2  gap-2">
+            <h1 className="text-3xl font-bold">{eventData?.eventName}</h1>
+            <h1>{eventData?.eventDate}</h1>
+            <h1>{eventData?.venue}</h1>
           </div>
-          {/* <h4 className='fr-gallery-main-lb-clientname'>AKSHAYANJALI</h4> */}
-          {/* <div>
-            <textarea className='fr-gallery-main-lb-textarea'
-              placeholder='Edit Maximum 150 Characters for client email/Qr' />
-          </div> */}
-          <div className="flex flex-col gap-2 justify-center h-[5rem] pt-4 ">
-            <h4 className="font-bold">Share with client</h4>
-            <span>PIN: 7478</span>
+          <div className="px-3">
+            <img src={eventData?.coverImage} alt="userImg" />
           </div>
         </div>
         <div className="fr-gallery-main-rb">
-          <h6 className="text-center text-md">GENERAL SETTINGS</h6>
+          <h6 className="text-center text-md  font-bold">
+            GENERAL SETTINGS & SHARING OPTIONS
+          </h6>
           <div className="r1">
-            <div className="flex flex-col gap-4">
+            <div className="flex justify-between gap-4   m-auto">
               <div className="flex justify-between">
-                <div className="flex justify-between">
-                  <h6>Full event access</h6>
-                  <div>
-                    <Switch
-                      checked={form.fullEventAccess}
-                      onChange={handleChange}
-                      name="fullEventAccess"
-                      color="primary"
-                    />
-                  </div>
-                </div>
-                <div className="flex justify-between">
-                  <h6>Face Search</h6>
-                  <div>
-                    <Switch
-                      checked={form.fullEventAccess}
-                      onChange={handleChange}
-                      name="fullEventAccess"
-                      color="primary"
-                    />
-                  </div>
+                <h6 className="text-lg">Full event access</h6>
+                <div>
+                  <Switch
+                    checked={form.fullEventAccess}
+                    onChange={handleChange}
+                    name="fullEventAccess"
+                    color="primary"
+                  />
                 </div>
               </div>
               <div className="flex justify-between">
-                <div className="flex justify-between">
-                  <h6>Client email</h6>
-                  <div>
-                    <Switch
-                      checked={form.fullEventAccess}
-                      onChange={handleChange}
-                      name="fullEventAccess"
-                      color="primary"
-                    />
-                  </div>
+                <h6 className="text-lg">Face Search</h6>
+                <div>
+                  <Switch
+                    checked={form.faceSearchAccess}
+                    onChange={handleChange}
+                    name="faceSearchAccess"
+                    color="primary"
+                  />
                 </div>
-                <div className="flex justify-between ">
+              </div>
+              <div className="flex justify-between">
+                <h6 className="text-lg">Client email</h6>
+                <div>
+                  <Switch
+                    checked={form.clientEmail}
+                    onChange={handleChange}
+                    name="clientEmail"
+                    color="primary"
+                  />
+                </div>
+                {/* <div className="flex justify-between ">
                   <h6>client whats app</h6>
                   <div>
                     <Switch
@@ -126,63 +173,110 @@ const FaceRecognitionGallery = () => {
                       color="primary"
                     />
                   </div>
+                </div> */}
+              </div>
+            </div>
+          </div>
+          <div className="">
+            <div className="flex justify-center gap-[10rem] ">
+              {form?.fullEventAccess && (
+                <div className="relative">
+                  <img className="w-[7rem] h-[7rem]" src={eventData?.qrCode} />
+                  <h6 className="text-center">Full access</h6>
+                  <p className="text-center">
+                    PIN: <span>{eventData?.fullAccessPin}</span>
+                  </p>
+                  <p
+                    className="py-2 text-xs font-bold text-center underline underline-offset-4 cursor-pointer"
+                    onClick={copyFullAccessLink}
+                  >
+                    COPY LINK
+                  </p>
+                  {fullAccessLinkCopied ? (
+                    <p className="text-center text-green-500 bg-black text-white absolute left-4 px-1 w-full rounded-lg">
+                      Link Copied
+                    </p>
+                  ) : null}
                 </div>
-              </div>
+              )}
+              {form?.faceSearchAccess && (
+                <div className="relative">
+                  <img
+                    src={eventData?.faceQrCode}
+                    className="w-[7rem] h-[7rem]"
+                  />
+                  <h6 className="text-center">Face Seacrh</h6>
+                  <p className="text-center">
+                    PIN: <span>{eventData?.faceSearchPin}</span>
+                  </p>
+                  <p
+                    className="py-2 text-xs font-bold text-center underline underline-offset-4 cursor-pointer"
+                    onClick={copyFaceSearchLink}
+                  >
+                    COPY LINK
+                  </p>
+                  {faceSearchLinkCopied ? (
+                    <p className="text-center text-green-500 bg-black text-white absolute left-4 px-1 w-full rounded-lg">
+                      Link Copied
+                    </p>
+                  ) : null}
+                </div>
+              )}
             </div>
           </div>
-
-          <div className="py-6 ">
-            <h6 className="text-center text-md">CHOOSE SAHRING OPTIONS</h6>
-            <div className="flex justify-center gap-[10rem] py-[2rem]">
-              <div>
-                <img
-                  src={
-                    "https://th.bing.com/th?id=OIP.CKXBqkgG-DU3EG864iMU2AHaHa&w=250&h=250&c=8&rs=1&qlt=90&o=6&dpr=1.3&pid=3.1&rm=2"
-                  }
-                  className="w-[7rem] h-[7rem]"
-                />
-                <h6 className="text-center">Full access</h6>
-                <p className="py-2 text-xs font-bold text-center underline underline-offset-4">
-                  COPY LINK
-                </p>
-              </div>
-              <div>
-                <img
-                  src={
-                    "https://th.bing.com/th?id=OIP.CKXBqkgG-DU3EG864iMU2AHaHa&w=250&h=250&c=8&rs=1&qlt=90&o=6&dpr=1.3&pid=3.1&rm=2"
-                  }
-                  className="w-[7rem] h-[7rem]"
-                />
-                <h6 className="text-center">Face Seacrh</h6>
-                <p className="py-2 text-xs font-bold text-center underline underline-offset-4">
-                  COPY LINK
-                </p>
-              </div>
-            </div>
-          </div>
-
           {/* share with clients */}
-          <div className="flex justify-between">
-            <div>
-              <h5>share with clients</h5>
+          <div className="">
+            <div className="flex gap-4">
+              <h6 className="text-lg">Share with clients</h6>
+              <div>
+                <Switch
+                  checked={form.shareWithCients}
+                  onChange={handleChange}
+                  name="shareWithCients"
+                  color="primary"
+                />
+              </div>
+            </div>
+            {form?.shareWithCients && (
               <div className=" space-x-5">
                 <input
                   type="email"
                   placeholder="Client Email"
                   className="border-[1px] border-gray-400 rounded-md px-1 py-1.5"
+                  name="clientEmail"
+                  value={clientEmail}
+                  onChange={(e) => setClientEmail(e.target.value)}
                 />
-                <button className="bg-gray-200 rounded-md w-[2rem] h-[2rem] tetxt-xl font-bold text-center">
+                <button
+                  className="bg-gray-200 rounded-md w-[2rem] h-[2rem] tetxt-xl font-bold text-center"
+                  onClick={() => {
+                    addClientEmail(clientEmail);
+                  }}
+                >
                   +
                 </button>
               </div>
-            </div>
+            )}
           </div>
-
-          <div id="face-gallery-form-save-btn">
-            <button>Save</button>
+          <div className="flex justify-center ">
+            <button
+              className="w-[25%] border-2 border-gray-300 bg-gray-300 shadow-lg rounded-xl font-bold py-2 hover:bg-gray-200 hover:font-black"
+              onClick={handleSave}
+            >
+              Save Settings
+            </button>
           </div>
         </div>
       </section>
+      {/* client email array */}
+      {form?.shareWithCients && clientEmailArr.length > 0 && (
+        <div className="fixed border-2 border-black bg-white bottom-2 right-0 w-[20%] px-2 rounded-md">
+          <h5>Client Emails</h5>
+          {clientEmailArr.map((email, idx) => (
+            <p key={idx}>{email}</p>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
