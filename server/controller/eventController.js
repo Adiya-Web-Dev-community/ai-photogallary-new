@@ -432,7 +432,7 @@ const getImagesArray = async (req, res) => {
         }
 
         const page = parseInt(req.query.page) || 1;
-        const pageSize = parseInt(req.query.pageSize) || 8;
+        const pageSize = parseInt(req.query.pageSize) || 20;
 
         const startIndex = (page - 1) * pageSize;
 
