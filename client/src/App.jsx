@@ -22,6 +22,7 @@ import SetPassword from "./components/register-user/set-passsword";
 import FullEventForm from "./components/full-event-access/FullEventForm/FullEventForm";
 import Event from "./components/full-event-access/Events/FullAccessEventPage";
 import FaceSearch from "./components/face-search/FaceSearch";
+import Display from "./components/display/display";
 
 function App() {
   const [auth, setAuth] = useState("");
@@ -43,11 +44,12 @@ function App() {
               path="/event/:eventName/:eventId"
               element={<EventDetailsPage />}
             />
+            <Route path="/display/:eventId" element={<Display />} />
             <Route
               path="/share-with-client/event/:id"
               element={<ShareWithClient />}
             />
-            <Route path="/display-page" element={<Signin />} />
+            
           </Route>
           {/* 
           <Route path="/gallary/:id" element={<Gallary />} />
