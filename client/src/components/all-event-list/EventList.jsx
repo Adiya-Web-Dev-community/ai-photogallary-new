@@ -46,6 +46,44 @@ const EventList = () => {
       });
   };
 
+  const handleUpdateEventStatus = async (eventId, newStatus) => {
+    try {
+      await axios.put(
+        `/event/${eventId}`,
+        { status: newStatus },
+        {
+          headers: {
+            authorization: token,
+          },
+        }
+      );
+      // Update the status of the event in the events list
+      setAllEvents((prevEvents) =>
+        prevEvents.map((event) =>
+          event._id === eventId ? { ...event, status: newStatus } : event
+        )
+      );
+      console.log("Event status updated successfully");
+      getAllEvents(); // Refresh events after status update
+    } catch (error) {
+      console.error("Error updating event status:", error);
+    }
+  };
+
+  const handleDeleteEvent = async (eventId) => {
+    try {
+      await axios.delete(`/event/${eventId}`, {
+        headers: {
+          authorization: token,
+        },
+      });
+      // Remove the deleted event from the events list
+      setAllEvents(allEvents.filter((event) => event._id !== eventId));
+      console.log("Event deleted successfully");
+    } catch (error) {
+      console.error("Error deleting event:", error);
+    }
+  };
   useEffect(() => {
     setAllEvents([]);
     getAllEvents();
@@ -111,6 +149,8 @@ const EventList = () => {
           <AllEventContainer
             allEvents={allEvents}
             eventRendering={eventRendering}
+            handleDeleteEvent={handleDeleteEvent}
+            handleUpdateEventStatus={handleUpdateEventStatus}
           />
         </div>
       </main>
