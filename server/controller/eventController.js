@@ -25,7 +25,9 @@ const getEvents = async (req, res) => {
             query.status = status;
         }
 
+
         const events = await Event.find(query).sort({ createdAt: -1 });
+
 
         return res.status(200).json({
             message: "Events fetched successfully",
@@ -36,7 +38,7 @@ const getEvents = async (req, res) => {
         console.log(error)
 
         return res.status(500).json({
-            message: "Something went wrong",
+            message: error.message,
             success: false,
         });
     }
@@ -148,19 +150,19 @@ const updateEvent = async (req, res) => {
 // To delete an event
 const deleteEvent = async (req, res) => {
     try {
-      const event = await Event.findByIdAndDelete(req.params.id);
-      return res.status(200).json({
-        message: "Event deleted successfully",
-        success: true,
-        data: event,
-      });
+        const event = await Event.findByIdAndDelete(req.params.id);
+        return res.status(200).json({
+            message: "Event deleted successfully",
+            success: true,
+            data: event,
+        });
     } catch (error) {
-      return res.status(500).json({
-        message: "Failed to delete event",
-        success: false,
-      });
+        return res.status(500).json({
+            message: "Failed to delete event",
+            success: false,
+        });
     }
-  };
+};
 
 
 
