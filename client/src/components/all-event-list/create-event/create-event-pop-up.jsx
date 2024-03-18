@@ -107,7 +107,7 @@ const CreateEventPopup = ({ handleClose, getAllEvents }) => {
           <textarea
             size="small"
             type="text"
-            name="eventName"
+            name="venue"
             value={createEventForm.venue}
             onChange={handleInuts}
             className="border-[0.5px] border-gray-400 min-h-[5rem] max-h-[5rem] rounded-md w-full"
@@ -130,7 +130,7 @@ const CreateEventPopup = ({ handleClose, getAllEvents }) => {
       <div className="create-event-pop-up-save-btn-container">
         <button
           onClick={handleSubmit}
-          className="disabled:cursor-not-allowed"
+          className="disabled:cursor-not-allowed mb-10"
           disabled={
             !createEventForm.eventName ||
             !createEventForm.eventDate ||
