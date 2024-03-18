@@ -45,7 +45,16 @@ const EventList = () => {
         console.log(err);
       });
   };
-
+  const handleDeleteEvent = async (eventId) => {
+    try {
+      await axios.delete(`/api/event/${eventId}`);
+      // Remove the deleted event from the events list
+      setAllEvents(events.filter((event) => event._id !== eventId));
+      console.log("Event deleted successfully");
+    } catch (error) {
+      console.error("Error deleting event:", error);
+    }
+  };
   useEffect(() => {
     setAllEvents([]);
     getAllEvents();
@@ -111,6 +120,7 @@ const EventList = () => {
           <AllEventContainer
             allEvents={allEvents}
             eventRendering={eventRendering}
+            handleDeleteEvent={handleDeleteEvent}
           />
         </div>
       </main>
