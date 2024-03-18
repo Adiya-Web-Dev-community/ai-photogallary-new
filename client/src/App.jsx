@@ -36,7 +36,7 @@ function App() {
             <Route path="/register-new-user" element={<RegisterUser />} />
             {/* <Route path="/set-password" element={<SetPassword />} /> */}
           </Route>
-          <Route element={<Pho tographer />}>
+          <Route element={<Photographer />}>
             <Route path="/dashboard-details" element={<DashBoardDetails />} />
             <Route path="/all-events-list" element={<EventList />} />
             <Route
