@@ -19,34 +19,19 @@ const eventSchema = new mongose.Schema({
     description: {
         type: String
     },
-    images: [
+    media: [
         {
             category: {
                 type: String
             },
-            imagesArr: [
-                { type: String }]
+            images: [
+                { type: String }],
+            videos: [{ type: String }]
 
         }
     ],
     emailsArray: [
         { type: String }
-    ],
-    videoLinks: [
-        {
-            title: {
-                type: String
-            },
-            link: {
-                type: String
-            },
-            description: {
-                type: String
-            },
-            thumbnail: {
-                type: String
-            }
-        }
     ],
     waterMarks: [
         {
