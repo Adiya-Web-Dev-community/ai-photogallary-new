@@ -126,7 +126,7 @@ const updateEvent = async (req, res) => {
         const user = await User.findById(userid);
 
         const event = await Event.findByIdAndUpdate(
-            req.params.eventId,
+            req.params.id,
             {
                 ...req.body,
             },
