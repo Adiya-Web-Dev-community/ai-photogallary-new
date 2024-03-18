@@ -1,182 +1,147 @@
 const mongose = require('mongoose');
 
 const eventSchema = new mongose.Schema({
-
-    eventName : {
-        type : String
+    eventName: {
+        type: String
     },
-    venu : {
-        type : String  
+    venue: {
+        type: String
     },
-    eventCode : {
-        type : String
+    eventDate: {
+        type: Date
     },
-    eventDate : {
-        type : Date
-    }, 
-    eventCode : {
-        type : String
+    eventCode: {
+        type: String
     },
-    coverImage : {
-        type : String
+    coverImage: {
+        type: String
     },
-    description : {
-        type : String
+    description: {
+        type: String
     },
-    isSubEvents : {
-        type : Boolean,
-        default : false
-    },
-    parentEvent : {
-        type : mongose.Schema.Types.ObjectId,
-        ref : "event"
-    },
-    subEvents : [
+    images: [
         {
-            type : mongose.Schema.Types.ObjectId,
-            ref : "event"
-        }
-    ],
-    qrCode :{
-        type : String
-    },
-    faceQrCode : {
-        type : String
-    },
-    // Access link
-
-    // Full access event 
-    link:{
-        type : String
-    },
-    faceSearchLink : {
-        type : String
-    },
-    imagesCategory : [
-        {
-            type : String
+            category: {
+                type: String
+            },
+            imagesArr: [
+                { type: String }]
 
         }
     ],
-    imagesArray : [
-        {
-            link : {
-                type : String
-            },
-           imagesCategory : {
-            type : String
-           }
-        }
+    emailsArray: [
+        { type: String }
     ],
-    emailsArray : [
-        {type : String}
-    ],
-    videoLinks : [
+    videoLinks: [
         {
-            title : {
-                type : String
+            title: {
+                type: String
             },
-            link : {
-                type : String
+            link: {
+                type: String
             },
-            description :{
-                type : String
+            description: {
+                type: String
             },
-            thumbnail : {
-                type : String
+            thumbnail: {
+                type: String
             }
         }
     ],
-    waterMarks : [
+    waterMarks: [
         {
-            type : String
+            type: String
         }
     ],
-
-    eventHost :{
-        email : {
-            type : String
+    eventHost: {
+        email: {
+            type: String
         },
-        name : {
-            type : String
+        name: {
+            type: String
         },
-        phone : {
-            type : String
+        phone: {
+            type: String
         }
     },
-    eventAccessUsers : [
+    eventAccessUsers: [
         {
-            name : {
-                type : String
+            name: {
+                type: String
             },
-            email : {
-                type : String
-            }, 
-            phone : {
-                type : String
+            email: {
+                type: String
             },
-            faceData : {
-                type : String   
+            phone: {
+                type: String
+            },
+            faceData: {
+                type: String
             },
             // status : {
             //     type : String,
             //     enum : ["pending", "rejected", "accepted", "delivered"],
             // },
-            sharedImagesArray : [
+            sharedImagesArray: [
                 {
-                    type : String
+                    type: String
                 }
             ]
         }
     ],
-
-    blockEmails : [
+    blockEmails: [
         {
-            type : String
+            type: String
         }
     ],
-    eventExpirationDate : {
-        type : Date
+    eventExpirationDate: {
+        type: Date
     },
-    dashboardId : {
+    dashboardId: {
         type: mongose.Schema.Types.ObjectId,
         ref: "dashboard",
     },
-    owner : {
-        type : String
-    },
-    status : {
-        type : String,
-        enum : ["published", "unpublished"],
-        default : "unpublished"
-    },
-    fullAccessPin :{
-        type : String
-    },
-    faceSearchPin : {
-        type : String
-    },
-    faceSearchPinRequired : {
-        type : Boolean, 
-        default : false
+    status: {
+        type: String,
+        enum: ["published", "unpublished"],
+        default: "unpublished"
     },
     // Settings
-    faceSearchAccess : {
-        type : Boolean,
-        default : false
+    //face search
+    faceSearchAccess: {
+        type: Boolean,
+        default: false
     },
-    fullEventAccess : {
-        type : Boolean,
-        default : false
+    faceSearchLink: {
+        type: String
     },
-    allowUserToPostImages : {
-        type : Boolean,
-        default : false
+    faceQrCode: {
+        type: String
     },
-
-    createdAt : {
-        type : Date,
-        default : Date.now
+    faceSearchPin: {
+        type: String
+    },
+    //full access
+    fullEventAccess: {
+        type: Boolean,
+        default: false
+    },
+    link: {
+        type: String
+    },
+    qrCode: {
+        type: String
+    },
+    fullAccessPin: {
+        type: String
+    },
+    allowUserToPostImages: {
+        type: Boolean,
+        default: false
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now
     }
 })
 
