@@ -1,6 +1,7 @@
 const DashBoard = require("../models/dashboard");
 const Event = require("../models/event");
 const User = require("../models/user");
+const fs = require("fs");
 const generateOTP = require("../helpers/otpHelper.js").generateOTP;
 const {
     eventConfirmation,
@@ -18,19 +19,13 @@ const getEvents = async (req, res) => {
         const status = req.query.status;
         const query = {
             dashboardId: user.dashboardId,
-            isSubEvents: false,
         };
 
         if (status !== "") {
             query.status = status;
         }
 
-        const events = await Event.find(query).populate({
-            path: "subEvents",
-            populate: {
-                path: "subEvents",
-            },
-        });
+        const events = await Event.find(query).sort({ createdAt: -1 });
 
         return res.status(200).json({
             message: "Events fetched successfully",
@@ -38,6 +33,8 @@ const getEvents = async (req, res) => {
             data: events,
         });
     } catch (error) {
+        console.log(error)
+
         return res.status(500).json({
             message: "Something went wrong",
             success: false,
@@ -50,12 +47,7 @@ const getEvent = async (req, res) => {
     try {
         const user = await User.findById(req.accountId);
 
-        const event = await Event.findById(req.params.id).populate({
-            path: "subEvents",
-            populate: {
-                path: "subEvents",
-            },
-        });
+        const event = await Event.findById(req.params.id)
 
         return res.status(200).json({
             message: "Event fetched successfully",
@@ -83,6 +75,7 @@ const addEvent = async (req, res) => {
             ...req.body,
             dashboardId: user.dashboardId,
         });
+
         let faceSearchLink = `http://localhost:5173/face-search/event/${event._id}`;
         let link = `http://localhost:5173/full-event-access/${event._id}`;
         event.link = link;
@@ -94,7 +87,9 @@ const addEvent = async (req, res) => {
 
         event.fullAccessPin = generateOTP()
         event.faceSearchPin = generateOTP()
+        const folderName = req.body.eventName
 
+        
 
         await event.save();
         eventConfirmation(
@@ -120,40 +115,6 @@ const addEvent = async (req, res) => {
     }
 };
 
-// Create a sub events for a event
-
-const addSubEvent = async (req, res) => {
-    try {
-        const userid = req.accountId;
-        const user = await User.findById(userid); /*.populate({
-            path: "dashboardId"
-        })*/
-        if (!user) {
-            return res.status(404).json({
-                message: "User not found",
-                success: false,
-            });
-        }
-        const event = await Event.findById(req.params.id);
-        const subEvent = await Event.create({
-            ...req.body,
-            isSubEvents: true,
-            dashboardId: user.dashboardId,
-            parentEvent: req.params.id,
-        });
-        event.subEvents.push(subEvent);
-        await event.save();
-        return res.status(200).json({
-            message: "Sub event added successfully",
-            success: true,
-        });
-    } catch (error) {
-        return res.status(500).json({
-            message: "Failed to add sub event",
-            success: false,
-        });
-    }
-};
 
 // To update an event
 const updateEvent = async (req, res) => {
@@ -201,50 +162,8 @@ const deleteEvent = async (req, res) => {
     }
   };
 
-// To get a sub event {passing sub event id}
-const getSubEvent = async (req, res) => {
-    try {
-        const event = await Event.findById(req.params.id);
-        if (!event) {
-            return res.status(404).json({
-                message: "Event not found",
-            });
-        }
-        return res.status(200).json({
-            message: "Event fetched successfully",
-            success: true,
-            data: event,
-        });
-    } catch (error) {
-        return res.status(500).json({
-            message: "Something went wrong",
-            success: false,
-        });
-    }
-};
 
-// To delete a sub event {passing sub event id}
-const deleteSubEvent = async (req, res) => {
-    try {
-        const event = await Event.findByIdAndDelete(req.params.id);
-        if (!event) {
-            return res.status(404).json({
-                message: "Event not found",
-                success: false,
-            });
-        }
 
-        return res.status(200).json({
-            message: "Event deleted successfully",
-            success: true,
-        });
-    } catch (error) {
-        return res.status(500).json({
-            message: "Something went wrong",
-            success: false,
-        });
-    }
-};
 
 const addYoutubeLinks = async (req, res) => {
     try {
@@ -626,9 +545,6 @@ module.exports = {
     addEvent,
     updateEvent,
     deleteEvent,
-    addSubEvent,
-    getSubEvent,
-    deleteSubEvent,
     addYoutubeLinks,
     getYoutubeLinks,
     updateYoutubeLinks,
