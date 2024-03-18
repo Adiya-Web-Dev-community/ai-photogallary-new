@@ -13,10 +13,10 @@ import Signin from "./components/signin/Signin";
 //photographer routes
 import DashBoardDetails from "./components/dashboard-details/DashBoardDetails";
 import EventList from "./components/all-event-list/EventList";
-import EventDetailsPage from "./components/event-details-page/EventDetailsPage"; //
+import EventDetailsPage from "./components/event-details-page/EventDetailsPage";
+import ShareWithClient from "./components/Share-with-client/ShareWithClient";
 //customer routes
 import SetupWatermark from "./components/setup-watermark/SetupWatermark";
-import ShareWithClient from "./components/Share-with-client/ShareWithClient";
 import SetPassword from "./components/register-user/set-passsword";
 //public routes- full access  , face search
 import FullEventForm from "./components/full-event-access/FullEventForm/FullEventForm";
@@ -45,15 +45,16 @@ function App() {
               element={<EventDetailsPage />}
             />
             <Route path="/display/:eventId" element={<Display />} />
+            <Route
+              path="/share-with-client/event/:id"
+              element={<ShareWithClient />}
+            />
+            
           </Route>
           {/* 
-        
           <Route path="/gallary/:id" element={<Gallary />} />
           <Route path="/watermaker-setup" element={<SetupWatermark />} />
-          <Route
-            path="/facerecognitiongallery"
-            element={<FaceRecognitionGallery />}
-          />
+         
           <Route
             path="/full-event-access/:eventId"
             element={<FullEventForm />}

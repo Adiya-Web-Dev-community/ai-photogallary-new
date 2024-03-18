@@ -12,6 +12,7 @@ const CreateEventPopup = ({ handleClose, getAllEvents }) => {
   const [createEventForm, setCreateEventForm] = useState({
     eventName: "",
     eventDate: "",
+    venue: "",
   });
 
   //set inputs
@@ -79,25 +80,39 @@ const CreateEventPopup = ({ handleClose, getAllEvents }) => {
         </h4>
       </div>
       <div className="py-3">
-        <TextField
-          size="small"
-          fullWidth
-          type="text"
-          name="eventName"
-          value={createEventForm.eventName}
-          onChange={handleInuts}
-        />
-        <TextField
-          sx={{
-            margin: "10px 0px",
-          }}
-          size="small"
-          fullWidth
-          type="date"
-          name="eventDate"
-          value={createEventForm.eventDate}
-          onChange={handleInuts}
-        />
+        <div>
+          <label>Event Name</label>
+          <TextField
+            size="small"
+            fullWidth
+            type="text"
+            name="eventName"
+            value={createEventForm.eventName}
+            onChange={handleInuts}
+          />
+        </div>
+        <div className="py-2">
+          <label>Event Date</label>
+          <TextField
+            size="small"
+            fullWidth
+            type="date"
+            name="eventDate"
+            value={createEventForm.eventDate}
+            onChange={handleInuts}
+          />
+        </div>
+        <div>
+          <label>Event Venue</label>
+          <textarea
+            size="small"
+            type="text"
+            name="venue"
+            value={createEventForm.venue}
+            onChange={handleInuts}
+            className="border-[0.5px] border-gray-400 min-h-[5rem] max-h-[5rem] rounded-md w-full"
+          />
+        </div>
       </div>
       <div>
         <h4 className="py-1.5 font-bold">Upload cover image</h4>
@@ -115,8 +130,12 @@ const CreateEventPopup = ({ handleClose, getAllEvents }) => {
       <div className="create-event-pop-up-save-btn-container">
         <button
           onClick={handleSubmit}
-          className="disabled:cursor-not-allowed"
-          disabled={!createEventForm.eventName || !createEventForm.eventDate}
+          className="disabled:cursor-not-allowed mb-10"
+          disabled={
+            !createEventForm.eventName ||
+            !createEventForm.eventDate ||
+            !createEventForm.venue
+          }
         >
           save
         </button>

@@ -187,29 +187,19 @@ const updateEvent = async (req, res) => {
 // To delete an event
 const deleteEvent = async (req, res) => {
     try {
-        const userid = req.accountId;
-        const user = await User.findById(userid);
-        const dashboard = await DashBoard.findById(user.dashboardId);
-        if (req.params.eventId in dashboard.events) {
-            const event = await Event.findByIdAndDelete(req.params.eventId);
-            dashboard.events.splice(req.params.eventId, 1);
-            return res.status(200).json({
-                message: "Event deleted successfully",
-                success: true,
-                data: event,
-            });
-        }
-        return res.status(404).json({
-            message: "Event not found",
-            success: false,
-        });
+      const event = await Event.findByIdAndDelete(req.params.id);
+      return res.status(200).json({
+        message: "Event deleted successfully",
+        success: true,
+        data: event,
+      });
     } catch (error) {
-        return res.status(500).json({
-            message: "Failed to delete event",
-            success: false,
-        });
+      return res.status(500).json({
+        message: "Failed to delete event",
+        success: false,
+      });
     }
-};
+  };
 
 // To get a sub event {passing sub event id}
 const getSubEvent = async (req, res) => {
@@ -442,7 +432,7 @@ const getImagesArray = async (req, res) => {
         }
 
         const page = parseInt(req.query.page) || 1;
-        const pageSize = parseInt(req.query.pageSize) || 8;
+        const pageSize = parseInt(req.query.pageSize) || 20;
 
         const startIndex = (page - 1) * pageSize;
 
@@ -629,11 +619,6 @@ const getClientYoutubeLinks = async (req, res) => {
         return res.status(500).json({ message: "Internal Server Error" });
     }
 };
-
-
-
-
-
 
 module.exports = {
     getEvents,
