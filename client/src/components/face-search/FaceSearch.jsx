@@ -1,16 +1,14 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
 import { useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import axios from "../../helpers/axios";
+import Display from "../../components/display/display";
 
 import "./FaceSearch.css";
 
 const FaceSearch = () => {
-  const dispatch = useDispatch();
   const { id } = useParams();
-  const [pin, setPin] = useState("");
   const navigate = useNavigate();
   const [data, setData] = useState({});
 
@@ -25,27 +23,10 @@ const FaceSearch = () => {
     }
   };
 
-  const validatePin = async (e) => {
-    e.preventDefault();
-    try {
-      const response = await axios.post(
-        `/${eventData.eventName}/event-access/${id}`,
-        { pin }
-      );
-      if (response.data.success) {
-        // If PIN is valid, navigate to the show event data page
-        navigate(`/show-event-data/${id}`);
-      }
-    } catch (error) {
-      toast.error("Invalid PIN. Please try again.");
-    }
-  };
-
   useEffect(() => {
     fetchEventDetails(id);
   }, [id]);
 
-  const [eventData, setEventData] = useState(null);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -75,21 +56,21 @@ const FaceSearch = () => {
       pin: formData.pin,
     };
 
-    //   axios
-    //     .post(`/event/request/${id}`, formattedFormData)
-    //     .then((res) => {
-    //       console.log(res);
-    //       if (res.data.success) {
-    //         toast.success(res.data.message);
-    //         setShowForm(false);
-    //         setStep(2);
-    //       } else {
-    //         toast.error(res.message);
-    //       }
-    //     })
-    //     .catch((error) => {
-    //       toast.error("PIN Required");
-    //     });
+    axios
+      .post(`/event/request/${id}`, formattedFormData)
+      .then((res) => {
+        console.log(res);
+        if (res.data.success) {
+          toast.success(res.data.message);
+          setShowForm(false);
+          setStep(2);
+        } else {
+          toast.error(res.message);
+        }
+      })
+      .catch((error) => {
+        toast.error("PIN Required");
+      });
   };
 
   const captureImage = () => {
@@ -122,69 +103,17 @@ const FaceSearch = () => {
     }
   };
 
-  //   const handleFaceCapture = () => {
-  //     if (imageData && formData.email) {
-  //       const requestData = {
-  //         email: formData.email,
-  //         faceData: imageData,
-  //       };
-  //       axios.put(`/event/request/${id}`, requestData);
-  //     } else {
-  //       console.error("No image data captured yet.");
-  //     }
-  //   };
-
   const handleFaceCapture = () => {
     if (imageData && formData.email) {
       const requestData = {
         email: formData.email,
         faceData: imageData,
       };
-      axios
-        .put(`/event/request/${id}`, requestData)
-        .then((res) => {
-          // Handle response if needed
-          console.log(res);
-          if (res.data.success) {
-            // Clear states and remove video stream
-            setImageData(null);
-            // setVideoStream(null);
-            setShowForm(true);
-            setStep(1);
-            setFormData({
-              firstName: "",
-              lastName: "",
-              email: "",
-              phone: "",
-              pin: "",
-            });
-            // Check if the video stream is active and turn it off
-            // if (videoStream) {
-            //   videoStream.getTracks().forEach((track) => {
-            //     track.stop();
-            //   });
-            //   setVideoStream(null);
-            // }
-            toast.success("Shared Face Data Successful");
-          }
-        })
-        .catch((error) => {
-          console.error(error);
-        });
+      axios.put(`/event/request/${id}`, requestData);
+    } else {
+      console.error("No image data captured yet.");
     }
   };
-
-  useEffect(() => {
-    axios
-      .get(`/event/${id}`)
-      .then((response) => {
-        console.log(response.data.data);
-        setEventData(response.data.data);
-      })
-      .catch((error) => {
-        console.error("Error fetching main event:", error);
-      });
-  }, []);
 
   useEffect(() => {
     if (step === 2 && showForm === false) {
@@ -193,58 +122,24 @@ const FaceSearch = () => {
   }, [step, showForm]);
 
   if (!data?.faceSearchAccess) {
-    return (
-      <div
-        className="private-container"
-        style={{
-          display: "flex",
-          alignItems: "center",
-          flexDirection: "column",
-        }}
-      >
-        <h1
-          style={{
-            fontSize: "1.7rem",
-            fontWeight: "800",
-            marginBottom: "1rem",
-          }}
-        >
-          This Event is Private
-        </h1>
-        <h2
-          style={{
-            fontSize: "1.5rem",
-            marginBottom: "2rem",
-          }}
-        >
-          Cannot Access this Event without Admin's Permission
-        </h2>
-        <h3
-          style={{
-            fontSize: "1.2rem",
-          }}
-        >
-          Thank you
-        </h3>
-      </div>
-    );
+    return <Display event={data} />;
   }
-  
+
   return (
-    <div className="event-form-container ">
-      <div className="event-form-left">
-        {eventData && (
-          <div>
-            <div className="px-12 py-6">
-              <p className="text-xl font-bold">Event Access Form</p>
-              <h2 className="text-xl font-bold underline">
-                {eventData.eventName}
-              </h2>
-            </div>
+    <div className="flex gap-[10rem] ">
+      {step === 1 && (
+        <div>
+          <Display event={data} />
+        </div>
+      )}
+
+      <div className="">
+        <div>
+          <div className="px-12 py-6">
+            <p className="text-xl font-bold">Event Access Form</p>
+            <h2 className="text-xl font-bold underline">{data.eventName}</h2>
           </div>
-        )}
-      </div>
-      <div className="event-form-right">
+        </div>
         <div className="form-content shadow">
           {showForm && (
             <form onSubmit={handleSubmit}>
@@ -257,6 +152,7 @@ const FaceSearch = () => {
                     onChange={handleInputs}
                     name="firstName"
                     placeholder="First Name"
+                    required
                   />
                   <input
                     type="text"
@@ -264,6 +160,7 @@ const FaceSearch = () => {
                     onChange={handleInputs}
                     name="lastName"
                     placeholder="Last Name"
+                    required
                   />
                 </div>
                 <div>
@@ -273,6 +170,7 @@ const FaceSearch = () => {
                     onChange={handleInputs}
                     name="email"
                     placeholder="Email address"
+                    required
                   />
                 </div>
                 <div>
@@ -285,6 +183,8 @@ const FaceSearch = () => {
                     value={formData.phone}
                     onChange={handleInputs}
                     name="phone"
+                    className="text-black"
+                    required
                   />
                 </div>
                 <div>
@@ -294,6 +194,8 @@ const FaceSearch = () => {
                     value={formData.pin}
                     onChange={handleInputs}
                     name="pin"
+                    className="text-black"
+                    required
                   />
                 </div>
                 <div>

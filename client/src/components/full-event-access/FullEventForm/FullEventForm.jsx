@@ -3,17 +3,18 @@ import "./FullEventForm.css";
 import axios from "../../../helpers/axios";
 import { useNavigate, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
+import Display from "../../display/display";
 
 const FullEventForm = () => {
-  const { eventId } = useParams();
+  const { id } = useParams();
   const [eventData, setEventData] = useState(null);
   const [pin, setPin] = useState("");
   const navigate = useNavigate();
 
   //fetch event details
-  const fetchEventDetails = async (eventId) => {
+  const fetchEventDetails = async (id) => {
     try {
-      const resp = await axios.get(`/event/${eventId}`);
+      const resp = await axios.get(`/event/${id}`);
       console.log("data", resp.data.data);
       setEventData(resp.data.data);
     } catch (error) {
@@ -26,12 +27,12 @@ const FullEventForm = () => {
     console.log();
     try {
       const response = await axios.post(
-        `/${eventData.eventName}/event-access/${eventId}`,
+        `/${eventData.eventName}/event-access/${id}`,
         pin
       );
       if (response.data.success) {
         // If PIN is valid, navigate to the show event data page
-        navigate(`/show-event-data/${eventId}`);
+        navigate(`/show-event-data/${id}`);
       }
     } catch (error) {
       toast.error("Invalid PIN. Please try again.");
@@ -39,45 +40,11 @@ const FullEventForm = () => {
   };
 
   useEffect(() => {
-    fetchEventDetails(eventId);
-  }, [eventId]);
+    fetchEventDetails(id);
+  }, [id]);
 
   if (!eventData?.fullEventAccess) {
-    return (
-      <div
-        className="private-container"
-        style={{
-          display: "flex",
-          alignItems: "center",
-          flexDirection: "column",
-        }}
-      >
-        <h1
-          style={{
-            fontSize: "1.7rem",
-            fontWeight: "800",
-            marginBottom: "1rem",
-          }}
-        >
-          This Event is Private
-        </h1>
-        <h2
-          style={{
-            fontSize: "1.5rem",
-            marginBottom: "2rem",
-          }}
-        >
-          Cannot Access this Event without Admin's Permission
-        </h2>
-        <h3
-          style={{
-            fontSize: "1.2rem",
-          }}
-        >
-          Thank you
-        </h3>
-      </div>
-    );
+    return <Display event={eventData} />;
   }
 
   return (

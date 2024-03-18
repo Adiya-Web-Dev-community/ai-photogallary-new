@@ -50,6 +50,7 @@ const getEvent = async (req, res) => {
         const user = await User.findById(req.accountId);
 
         const event = await Event.findById(req.params.id)
+        console.log("event fetched", event)
 
         return res.status(200).json({
             message: "Event fetched successfully",
@@ -60,6 +61,7 @@ const getEvent = async (req, res) => {
         return res.status(500).json({
             message: "Something went wrong",
             success: false,
+            msg: error.message
         });
     }
 };
@@ -91,7 +93,7 @@ const addEvent = async (req, res) => {
         event.faceSearchPin = generateOTP()
         const folderName = req.body.eventName
 
-        
+
 
         await event.save();
         eventConfirmation(
