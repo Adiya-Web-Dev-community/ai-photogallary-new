@@ -1,7 +1,14 @@
 const mongose = require('mongoose');
 
 const eventSchema = new mongose.Schema({
+
     eventName : {
+        type : String
+    },
+    venu : {
+        type : String  
+    },
+    eventCode : {
         type : String
     },
     eventDate : {
@@ -45,9 +52,20 @@ const eventSchema = new mongose.Schema({
     faceSearchLink : {
         type : String
     },
-    imagesArray : [
+    imagesCategory : [
         {
             type : String
+
+        }
+    ],
+    imagesArray : [
+        {
+            link : {
+                type : String
+            },
+           imagesCategory : {
+            type : String
+           }
         }
     ],
     emailsArray : [
