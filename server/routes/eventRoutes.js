@@ -20,7 +20,18 @@ const {
   getClientImagesArray,
   pinValidate,
   getClientYoutubeLinks,
+
+
+
+  createNewImageCategory,
+  deleteImageCategory,
+  uploadImage,
+  getAllImages,
+  deleteImagesOfEvent
 } = require("../controller/eventController");
+
+const { uploadImg, compressImages} = require("../middleware/imageUpload");
+
 
 // Get all events
 router.get("/events", middleware, getEvents);
@@ -78,6 +89,13 @@ router.get("/event/images/show-all/:id",getClientImagesArray)
 
 router.get("/event/videos/show-all/:id", getClientYoutubeLinks)
 
+router.post("/event/create-image-category/:id",createNewImageCategory)
 
+router.delete("/event/delete-image-category/:id",deleteImageCategory)
+
+router.post("/event/upload-image/category/:id/:category",uploadImg, compressImages, uploadImage) 
+
+
+router.get("/event/:id/category", getAllImages)
 module.exports = router;
 
