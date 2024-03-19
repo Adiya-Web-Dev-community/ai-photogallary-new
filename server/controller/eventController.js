@@ -3,7 +3,7 @@ const Event = require("../models/event");
 const User = require("../models/user");
 const fs = require("fs");
 const path = require("path");
-
+const multer = require("multer");
 const generateOTP = require("../helpers/otpHelper.js").generateOTP;
 const {
     eventConfirmation,
@@ -12,6 +12,8 @@ const {
 const QRCode = require("qrcode");
 const Jimp = require("jimp");
 const axios = require("axios");
+
+
 
 // Get all events
 const getEvents = async (req, res) => {
@@ -58,7 +60,7 @@ const getEvent = async (req, res) => {
         return res.status(500).json({
             message: "Something went wrong",
             success: false,
-            msg: error.message
+            msg: error.message,
         });
     }
 };
@@ -669,8 +671,90 @@ const deleteFolder = (folderPath) => {
     }
 };
 
+const uploadImage = async (req, res) => {
+    try {
+        
+        const eventId = req.params.id;
+        console.log(`Uploading images for event: ${eventId}`);
+            res.status(200).json({ message: 'Images uploaded successfully' });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
 
 
+
+const getAllImages = async (req, res) => {
+    try {
+        const eventId = req.params.id;
+        const page = parseInt(req.query.page) || 1;
+        const pageSize = 20;
+
+        const event = await Event.findById(eventId);
+        if (!event) {
+            return res.status(404).json({ error: 'Event not found' });
+        }
+
+        const offset = (page - 1) * pageSize;
+
+        let imagesForPage = [];
+
+        for (let i = offset; i < offset + pageSize && i < event.imagePaths.length; i++) {
+            const imagePathObj = event.imagePaths[i];
+            const category = imagePathObj.category;
+            const imagePath = imagePathObj.path;
+
+            if (fs.existsSync(imagePath)) {
+                imagesForPage.push({ category, path: imagePath });
+            }
+        }
+
+        const totalImages = event.imagePaths.length;
+        const totalPages = Math.ceil(totalImages / pageSize);
+
+        const paginationInfo = {
+            currentPage: page,
+            totalPages: totalPages,
+            totalImages: totalImages
+        };
+
+        res.status(200).json({ images: imagesForPage, pagination: paginationInfo });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+}
+
+
+
+const deleteImagesOfEvent = async (req, res) => {
+    try {
+        const eventId = req.params.id;
+        const { imagePaths } = req.body;
+
+        const event = await Event.findById(eventId);
+        if (!event) {
+            return res.status(404).json({ error: 'Event not found' });
+        }
+
+        for (const imagePath of imagePaths) {
+            event.imagePaths = event.imagePaths.filter(img => img.path !== imagePath);
+
+            if (fs.existsSync(imagePath)) {
+                fs.unlinkSync(imagePath);
+            }
+        }
+
+        await event.save();
+
+        res.status(200).json({ message: 'Images deleted successfully' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+}
 
 
 module.exports = {
@@ -691,4 +775,10 @@ module.exports = {
     getClientImagesArray,
     pinValidate,
     getClientYoutubeLinks,
+    createNewImageCategory,
+    deleteImageCategory,
+    uploadImage,
+    getAllImages,
+    deleteImagesOfEvent
+
 };

@@ -19,14 +19,10 @@ const eventSchema = new mongose.Schema({
     description: {
         type: String
     },
-    images: [
+    imagePaths: [
         {
-            category: {
-                type: String
-            },
-            imagesArr: [
-                { type: String }]
-
+            category: { type: String },
+            path: { type: String }
         }
     ],
     emailsArray: [
@@ -78,10 +74,6 @@ const eventSchema = new mongose.Schema({
             faceData: {
                 type: String
             },
-            // status : {
-            //     type : String,
-            //     enum : ["pending", "rejected", "accepted", "delivered"],
-            // },
             sharedImagesArray: [
                 {
                     type: String
