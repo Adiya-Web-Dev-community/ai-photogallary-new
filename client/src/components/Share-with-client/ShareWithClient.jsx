@@ -96,6 +96,19 @@ const FaceRecognitionGallery = () => {
     }
   };
 
+  // Function to format event date
+  const formatEventDate = (dateString) => {
+    const date = new Date(dateString);
+    const month = date.toLocaleString("default", { month: "short" });
+    const day = date.getDate();
+    const year = date.getFullYear();
+    return `${month} ${day} ${year}`;
+  };
+  // Format event date if it exists
+  const formattedDate = eventData?.eventDate
+    ? formatEventDate(eventData?.eventDate)
+    : "";
+
   return (
     <div className="fr-gallery-wrapper  ">
       <section className="fr-gallery-header ">
@@ -114,15 +127,22 @@ const FaceRecognitionGallery = () => {
           </button>
         </div>
       </section>
-      <section className="mt-2 flex py-10 gap-10  justify-between w-[90%] m-auto h-[40rem]">
-        <div className="flex gap-[6rem] flex-col border-r-4">
+      <section className="mt-2 flex py-10 gap-8 justify-between w-[90%] m-auto h-[40rem]">
+        <div className="flex gap-[3rem] flex-col border-r-4">
           <div className="flex flex-col px-2  gap-2">
             <h1 className="text-3xl font-bold">{eventData?.eventName}</h1>
-            <h1>{eventData?.eventDate}</h1>
-            <h1>{eventData?.venue}</h1>
+            <h1 className="text-md  font-bold">
+              {formattedDate.split(" ")[0]}, {formattedDate.split(" ")[1]},{" "}
+              {formattedDate.split(" ")[2]}
+            </h1>
+            <h1 className="text-sm">{eventData?.venue}</h1>
           </div>
           <div className="px-3">
-            <img src={eventData?.coverImage} alt="userImg" />
+            <img
+              src={eventData?.coverImage}
+              alt="userImg"
+              className="w-[35rem] h-[20rem]"
+            />
           </div>
         </div>
         <div className="fr-gallery-main-rb">
