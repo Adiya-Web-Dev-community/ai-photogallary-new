@@ -66,7 +66,63 @@ const getEvent = async (req, res) => {
 };
 
 // To add an event
+// const addEvent = async (req, res) => {
+//     try {
+//         const userid = req.accountId;
+//         const user = await User.findById(userid).populate({
+//             path: "dashboardId",
+//         });
+
+//         const event = await Event.create({
+//             ...req.body,
+//             dashboardId: user.dashboardId,
+//         });
+
+//         let faceSearchLink = `http://localhost:5173/face-search/event/${event._id}`;
+//         let link = `http://localhost:5173/full-event-access/${event._id}`;
+//         event.link = link;
+//         event.faceSearchLink = faceSearchLink;
+//         const qrCode = await QRCode.toDataURL(link);
+//         const faceQrCode = await QRCode.toDataURL(faceSearchLink);
+//         event.faceQrCode = faceQrCode;
+//         event.qrCode = qrCode;
+
+//         event.fullAccessPin = generateOTP();
+//         event.faceSearchPin = generateOTP();
+
+//         // Creating folder for database
+//         const databaseDir = path.join(__dirname, "..", "..", "database");
+//         const eventDir = path.join(databaseDir, "events", event._id.toString());
+//         fs.mkdirSync(eventDir);
+
+//         await event.save();
+//         eventConfirmation(
+//             event.eventHost.email,
+//             event.eventHost.name,
+//             event.name,
+//             event.qrCode,
+//             event.link,
+//             event.faceSearchLink,
+//             event.faceQrCode
+//         );
+
+//         return res.status(200).json({
+//             message: "Event added successfully",
+//             success: true,
+//             event,
+//         });
+//     } catch (error) {
+//         console.log(error);
+//         return res.status(500).json({
+//             message: "Failed to add event",
+//             success: false,
+//         });
+//     }
+// };
+
+
 const addEvent = async (req, res) => {
+    console.log(req.body)
     try {
         const userid = req.accountId;
         const user = await User.findById(userid).populate({
@@ -77,23 +133,18 @@ const addEvent = async (req, res) => {
             ...req.body,
             dashboardId: user.dashboardId,
         });
-
         let faceSearchLink = `http://localhost:5173/face-search/event/${event._id}`;
         let link = `http://localhost:5173/full-event-access/${event._id}`;
         event.link = link;
         event.faceSearchLink = faceSearchLink;
         const qrCode = await QRCode.toDataURL(link);
         const faceQrCode = await QRCode.toDataURL(faceSearchLink);
-        event.faceQrCode = faceQrCode;
+        event.faceQrCode = faceQrCode
         event.qrCode = qrCode;
 
-        event.fullAccessPin = generateOTP();
-        event.faceSearchPin = generateOTP();
+        event.fullAccessPin = generateOTP()
+        event.faceSearchPin = generateOTP()
 
-        // Creating folder for database
-        const databaseDir = path.join(__dirname, "..", "..", "database");
-        const eventDir = path.join(databaseDir, "events", event._id.toString());
-        fs.mkdirSync(eventDir);
 
         await event.save();
         eventConfirmation(
@@ -103,7 +154,7 @@ const addEvent = async (req, res) => {
             event.qrCode,
             event.link,
             event.faceSearchLink,
-            event.faceQrCode
+            event.faceQrCode,
         );
 
         return res.status(200).json({
@@ -112,7 +163,6 @@ const addEvent = async (req, res) => {
             event,
         });
     } catch (error) {
-        console.log(error);
         return res.status(500).json({
             message: "Failed to add event",
             success: false,
