@@ -20,11 +20,13 @@ const Display = ({ event }) => {
   return (
     <div className="container">
       <div className="max-w-3xl mx-auto">
-        <div className="text-center text-2xl font-semibold text-gray-600">
-          <p>This event is not live yet.</p>
-          <p>We will soon notify you when the event is published,</p>
-          <p>Thank you for visiting Ai gallery</p>
-        </div>
+        {event?.status === "published" ? null : (
+          <div className="text-center text-2xl font-semibold text-gray-600">
+            <p>This event is not live yet.</p>
+            <p>We will soon notify you when the event is published,</p>
+            <p>Thank you for visiting Ai gallery</p>
+          </div>
+        )}
         <div className="flex bg-gray-100 p-14 mt-4">
           <div className="w-1/2">
             <div className="w-80 h-auto bg-white p-4 mt-10">
