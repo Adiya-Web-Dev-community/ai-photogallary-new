@@ -121,7 +121,7 @@ const ShowImages = () => {
   };
   return (
     <div className="">
-      <div className="image-container relative grid grid-cols-3 items-center  gap-4 mx-24">
+      <div className="image-container relative grid grid-cols-3  gap-4 mx-24">
         {imageData.map((image, index) => (
           <div
             key={index}
