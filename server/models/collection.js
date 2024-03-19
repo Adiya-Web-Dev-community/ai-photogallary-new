@@ -1,4 +1,4 @@
-const mongoose = requires("mongoose");
+const mongoose = require("mongoose");
 
 const collection_schema = new mongoose.Schema({
   name: { type: String },
@@ -7,3 +7,4 @@ const collection_schema = new mongoose.Schema({
 });
 
 const collection_model = mongoose.model("collection", collection_schema);
+module.exports = collection_model;

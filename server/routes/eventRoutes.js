@@ -21,17 +21,15 @@ const {
   pinValidate,
   getClientYoutubeLinks,
 
-
-
   createNewImageCategory,
   deleteImageCategory,
   uploadImage,
   getAllImages,
-  deleteImagesOfEvent
+  deleteImagesOfEvent,
+  getCollectionsOfEvent,
 } = require("../controller/eventController");
 
-const { uploadImg, compressImages} = require("../middleware/imageUpload");
-
+const { uploadImg, compressImages } = require("../middleware/imageUpload");
 
 // Get all events
 router.get("/events", middleware, getEvents);
@@ -49,18 +47,15 @@ router.put("/event/:id", middleware, updateEvent);
 
 // Get a subevent
 
-
 // Delete a subevent
-
 
 // // Fetech all sub events
 // router.get("/subevents/:id", middleware, getAllSubEvents)
 
 // Delete a event
-router.delete("/event/:id", middleware,deleteEvent);
+router.delete("/event/:id", middleware, deleteEvent);
 
-
-// Update youtube links 
+// Update youtube links
 router.put("/event/:id/youtube-links/:linkId", middleware, updateYoutubeLinks);
 
 // Add youtube links
@@ -70,32 +65,43 @@ router.post("/event/:id/youtube-links", middleware, addYoutubeLinks);
 router.get("/event/:id/youtube-links", middleware, getYoutubeLinks);
 
 // Delete youtube links
-router.delete("/event/:id/youtube-links/:linkId", middleware, deleteYoutubeLinks);
+router.delete(
+  "/event/:id/youtube-links/:linkId",
+  middleware,
+  deleteYoutubeLinks
+);
 
 router.get("/event/:id/event-images", middleware, getImagesArray);
 
-router.post("/event/:id/event-images", middleware, addImages);
+router.post("/add-images", addImages);
 
-router.put("/event/:id/event-images/add-watermark", middleware, addWatermarkInImages);
+router.get("/get-all-collections/:eventId", getCollectionsOfEvent);
+
+router.put(
+  "/event/:id/event-images/add-watermark",
+  middleware,
+  addWatermarkInImages
+);
 
 router.delete("/event/:id/event-images", middleware, deleteImages);
 
-
-
 // Client side apis
-router.post("/:eventName/event-access/:id",pinValidate)
+router.post("/:eventName/event-access/:id", pinValidate);
 
-router.get("/event/images/show-all/:id",getClientImagesArray)
+router.get("/event/images/show-all/:id", getClientImagesArray);
 
-router.get("/event/videos/show-all/:id", getClientYoutubeLinks)
+router.get("/event/videos/show-all/:id", getClientYoutubeLinks);
 
-router.post("/event/create-image-category/:id",createNewImageCategory)
+router.post("/event/create-image-category/:id", createNewImageCategory);
 
-router.delete("/event/delete-image-category/:id",deleteImageCategory)
+router.delete("/event/delete-image-category/:id", deleteImageCategory);
 
-router.post("/event/upload-image/category/:id/:category",uploadImg, compressImages, uploadImage) 
+router.post(
+  "/event/upload-image/category/:id/:category",
+  uploadImg,
+  compressImages,
+  uploadImage
+);
 
-
-router.get("/event/:id/category", getAllImages)
+router.get("/event/:id/category", getAllImages);
 module.exports = router;
-
