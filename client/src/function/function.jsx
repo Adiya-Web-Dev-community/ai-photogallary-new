@@ -61,5 +61,14 @@
     }
   };
 
-  export {resizeImage,compressImage,convertBytesToMB}
+  function convertImageToBase64(file, callback) {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = function(event) {
+        const base64String = event.target.result;
+        callback(base64String);
+    };
+}
+
+  export {resizeImage,compressImage,convertBytesToMB,convertImageToBase64}
   

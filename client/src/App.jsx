@@ -23,6 +23,8 @@ import FullEventForm from "./components/full-event-access/FullEventForm/FullEven
 import Event from "./components/full-event-access/Events/FullAccessEventPage";
 import FaceSearch from "./components/face-search/FaceSearch";
 import Display from "./components/display/display";
+import WaterMarkController from "./components/controller/controller";
+import AddImageModal from "./components/event-details-page/add-image-modal/add-image-modal";
 
 function App() {
   const [auth, setAuth] = useState("");
@@ -66,6 +68,7 @@ function App() {
             element={<EventAccessForm />}
           /> */}
         </Routes>
+        {/* <WaterMarkController/> */}
       </div>
     </Provider>
   );
