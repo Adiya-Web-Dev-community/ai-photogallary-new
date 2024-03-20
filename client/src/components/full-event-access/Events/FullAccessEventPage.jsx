@@ -11,7 +11,9 @@ const Event = () => {
   const [event, setEventData] = React.useState(null);
 
   useEffect(() => {
-    axios.get(`/event/${id}`).then((res) => setEventData(res.data.data));
+    axios.get(`/event/${id}`).then((res) => {
+      setEventData(res.data.data);
+    });
   }, []);
 
   // Function to format event date
@@ -44,7 +46,7 @@ const Event = () => {
           </div>
         </div>
       </div>
-      <div className="tabs mx-24 mt-4">
+      {/* <div className="tabs mx-24 mt-4">
         <button
           className={`tab-button ${tab === "images" ? "active" : ""}`}
           onClick={() => setTab("images")}
@@ -57,9 +59,10 @@ const Event = () => {
         >
           Videos
         </button>
-      </div>
+      </div> */}
       <div className="show-container">
-        {tab === "images" ? <ShowImages /> : <ShowVideos />}
+        {/* {tab === "images" ? <ShowImages event={event} /> : <ShowVideos />} */}
+        <ShowImages event={event} />
       </div>
     </div>
   );
