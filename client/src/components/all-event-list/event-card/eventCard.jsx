@@ -87,7 +87,7 @@ const EventCard = ({ event, onDelete, onUpdateStatus }) => {
       />
       <div className="flex  justify-between items-center px-6 py-4 ">
         <div className="mr-4 cursor-pointer" onClick={handleViewClick}>
-          <h2 className="font-bold text-xl mb-2 hover:underline hover:underline-offset-4 hover:cursor-pointer ">
+          <h2 className="font-bold text-lg mb-2 hover:underline hover:underline-offset-4 hover:cursor-pointer ">
             {event.eventName.length > 20
               ? `${event.eventName.slice(0, 20)}...`
               : event.eventName}
