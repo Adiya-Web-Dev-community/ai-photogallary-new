@@ -1,16 +1,25 @@
 import { useState } from "react";
 import axios from "../../helpers/axios";
 
-const SignupLoginPopup = () => {
+const SignupLoginPopup = ({ onClose }) => {
   const [email, setEmail] = useState("");
+  const [error, setError] = useState("");
 
   //handle submit
-  const handleSubmit = async () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     try {
-      const resp = await axios.post("/signup-login", email);
-      //close modal store token in local storage
+      const resp = await axios.post("/signup-login", { email: email });
+      const { success, msg, token } = resp.data;
+      if (success) {
+        localStorage.setItem("fav-token", token);
+        onClose();
+      } else {
+        setError(msg);
+      }
     } catch (err) {
       console.log(err);
+      setError("An error occurred. Please try again.");
     }
   };
 
@@ -23,12 +32,16 @@ const SignupLoginPopup = () => {
         >
           <div className="flex justify-between">
             <h1 className="text-xl font-bold">LOGIN</h1>
-            <p className="text-lg font-bold hover:text-xl">X</p>
+            <p className="text-lg font-bold hover:text-xl" onClick={onClose}>
+              X
+            </p>
           </div>
+          {error && <p className="text-red-500">{error}</p>}
           <div>
             <label>Enter your email *</label>
             <input
               type="email"
+              value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
               className="bg-white w-full rounded-md py-2 px-2 shadow-lg"
