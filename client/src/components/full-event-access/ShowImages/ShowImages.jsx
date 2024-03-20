@@ -81,6 +81,7 @@ import copy from "clipboard-copy";
 import "./ShowImages.css"; // Import CSS file for styling
 import axios from "../../../helpers/axios";
 import { useParams } from "react-router-dom";
+import { toast } from "react-hot-toast";
 
 const ShowImages = ({ event }) => {
   const { id } = useParams();
@@ -96,6 +97,7 @@ const ShowImages = ({ event }) => {
       setImageData(res.data.arr);
       console.log("COLLECTIONS", res.data);
     });
+    toast.success("Image added to favourite");
   };
 
   useEffect(() => {
