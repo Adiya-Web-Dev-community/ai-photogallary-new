@@ -86,11 +86,21 @@ const FaceRecognitionGallery = () => {
   //handle save
   const handleSave = async () => {
     try {
-      const res = await axios.put(`/event/${id}`, form, {
-        headers: {
-          authorization: token,
+      const res = await axios.put(
+        `/event/${id}`,
+        form,
+        {
+          fullEventAccess: form.fullEventAccess,
+          faceSearchAccess: form.faceSearchAccess,
+          shareViaEmail: form.shareWithCients,
+          emailsArray: clientEmailArr,
         },
-      });
+        {
+          headers: {
+            authorization: token,
+          },
+        }
+      );
     } catch (err) {
       console.log(err);
     }
