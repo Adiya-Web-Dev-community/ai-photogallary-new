@@ -42,7 +42,11 @@ import axios from "../../../helpers/axios";
 
 const ShowVideos = () => {
   const { eventId } = useParams();
-  const [videoLinks, setVideoLinks] = useState([]);
+  const [videoLinks, setVideoLinks] = useState([
+    { link: "https://www.youtube.com/watch?v=VIDEO_ID_1", title: "Title 1" },
+    { link: "https://www.youtube.com/watch?v=VIDEO_ID_2", title: "Title 2" },
+    { link: "https://www.youtube.com/watch?v=VIDEO_ID_3", title: "Title 3" },
+  ]);
 
   useEffect(() => {
     const fetchVideos = async () => {
@@ -59,7 +63,7 @@ const ShowVideos = () => {
   }, []); // Fetch data only once when the component mounts
 
   return (
-    <div className="show-videos-container">
+    <div className="show-videos-container mx-24">
       {videoLinks.length === 0 ? (
         <p
           style={{
