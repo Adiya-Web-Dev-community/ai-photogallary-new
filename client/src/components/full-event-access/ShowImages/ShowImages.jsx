@@ -97,9 +97,11 @@ const ShowImages = ({ event }) => {
       console.log("COLLECTIONS", res.data);
     });
   };
+
   useEffect(() => {
     getImagesCollections();
   }, []);
+
   const handleImageClick = (imageUrl) => {
     setSelectedImageUrl(imageUrl);
     setModalVisible(true);
@@ -109,6 +111,7 @@ const ShowImages = ({ event }) => {
     setModalVisible(false);
     setSelectedImageUrl("");
   };
+
   const handleShareClick = (link) => {
     copy(link); // Copy the link
     setCopied(true); // Set copied state to true
@@ -116,11 +119,36 @@ const ShowImages = ({ event }) => {
       setCopied(false); // Reset copied state after 2 seconds
     }, 1000);
   };
+
+  const handleAddToFavorites = (imageLink) => {
+    copy(imageLink);
+    const token = localStorage.getItem("fav-token");
+    if (token) {
+      axios
+        .put(
+          "/add-favourite-images",
+          { imageLink },
+          { headers: { Authorization: `${token}` } }
+        )
+        .then((res) => {
+          // Handle response if needed
+          console.log("Image added to favorites:", res.data);
+        })
+        .catch((error) => {
+          // Handle error
+          console.error("Error adding image to favorites:", error);
+        });
+    } else {
+      console.error("Token not found!");
+    }
+  };
+
   const handleTabClick = (tabName) => {
     setActiveTab(tabName);
   };
+
   return (
-    <div className="">
+    <div className="mt-10">
       <div className="flex mx-24">
         {imageData &&
           imageData.map((collection, index) => (
@@ -139,12 +167,12 @@ const ShowImages = ({ event }) => {
             </div>
           ))}
       </div>
-      <div className="image-container relative py-10 mx-20 h-auto ">
+      <div className="image-container py-10 mx-20 h-auto ">
         {imageData &&
           imageData.map((collection) => (
             <div
               key={collection._id}
-              className={`grid grid-cols-4 gap-2 ${
+              className={`grid grid-cols-4 gap-2 z-10 ${
                 activeTab !== collection.name ? "hidden" : ""
               }`}
             >
@@ -219,6 +247,7 @@ const ShowImages = ({ event }) => {
                               stroke="white"
                               width="24"
                               height="24"
+                              onClick={() => handleAddToFavorites(image)}
                             >
                               <path
                                 stroke-linecap="round"
@@ -245,7 +274,7 @@ const ShowImages = ({ event }) => {
       {/* Modal for displaying the clicked image */}
       {modalVisible && (
         <div
-          className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-white bg-opacity-75"
+          className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-white bg-opacity-75 z-40"
           onClick={closeModal}
         >
           <div
@@ -262,7 +291,7 @@ const ShowImages = ({ event }) => {
               <img
                 src={selectedImageUrl}
                 alt="Selected Image"
-                className="w-full h-auto"
+                className="max-w-5xl h-auto"
               />
             </div>
           </div>
