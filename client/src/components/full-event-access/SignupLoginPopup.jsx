@@ -1,3 +1,4 @@
+import { useState } from "react";
 import axios from "../../helpers/axios";
 
 const SignupLoginPopup = () => {
@@ -14,11 +15,11 @@ const SignupLoginPopup = () => {
   };
 
   return (
-    <main className="w-scree h-screen flex justify-center items-center bg-black/50">
-      <div className="w-full h-full flex justify-cenetr items-center">
+    <main className="fixed top-0 left-0 w-screen h-screen flex justify-center items-center bg-white/80">
+      <div className="w-full h-full flex justify-center items-center px-10">
         <form
           onSubmit={handleSubmit}
-          className="bg-gray-500 shadow-md rounded-lg"
+          className="bg-gray-300 shadow-md rounded-lg w-[40%]  px-6 py-6 space-y-4"
         >
           <div className="flex justify-between">
             <h1 className="text-xl font-bold">LOGIN</h1>
@@ -30,7 +31,7 @@ const SignupLoginPopup = () => {
               type="email"
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="bg-white w-full rounded-md py-1 px-2 shadow-lg"
+              className="bg-white w-full rounded-md py-2 px-2 shadow-lg"
             />
           </div>
           <div className="w-full flex justify-center">

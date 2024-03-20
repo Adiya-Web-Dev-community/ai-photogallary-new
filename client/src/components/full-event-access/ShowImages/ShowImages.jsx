@@ -78,7 +78,6 @@ import { useState, useEffect } from "react";
 import { FaRegHeart, FaRegShareSquare } from "react-icons/fa";
 import { MdOutlineFileDownload } from "react-icons/md";
 import copy from "clipboard-copy";
-// import CopyLink from "../../CopyLink/CopyLink";
 import "./ShowImages.css"; // Import CSS file for styling
 import axios from "../../../helpers/axios";
 import { useParams } from "react-router-dom";
