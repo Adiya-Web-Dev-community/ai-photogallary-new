@@ -43,10 +43,10 @@ const CreateEventPopup = ({ handleClose, getAllEvents }) => {
   //handle final submit data
   const handleSubmit = async () => {
     if (!imageByteCode) {
-      toast.error("Please upload cover image");
+      return toast.error("Please upload cover image");
     }
-    toast.loading("Uplaoding Image..");
     try {
+      toast.loading("Uplaoding Image..");
       const resp = await axios.post(
         "/event",
         { ...createEventForm, coverImage: imageByteCode },

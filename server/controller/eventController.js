@@ -12,6 +12,7 @@ const {
 const QRCode = require("qrcode");
 const Jimp = require("jimp");
 const axios = require("axios");
+const Collection = require("../models/collection.js");
 
 // Get all events
 const getEvents = async (req, res) => {
@@ -324,32 +325,105 @@ const updateYoutubeLinks = async (req, res) => {
 };
 
 const addImages = async (req, res) => {
+  const { eventId, collectionId, imagesArray } = req.body;
+
   try {
-    const eventId = req.params.id;
-    const { imagesArray } = req.body;
-
-    if (
-      !Array.isArray(imagesArray) ||
-      imagesArray.some((image) => typeof image !== "string")
-    ) {
-      return res.status(400).json({ message: "Invalid imagesArray data" });
+    if (collectionId) {
+      const isCollection = await Collection.findOne({
+        $and: [{ eventId: eventId }, { _id: collectionId }],
+      });
+      if (isCollection) {
+        if (!imagesArray) {
+          return res.send({ success: false, msg: "Cannot find image array" });
+        }
+        if (
+          !Array.isArray(imagesArray) ||
+          imagesArray.some((image) => typeof image !== "string")
+        ) {
+          return res.status(400).json({ message: "Invalid imagesArray data" });
+        } else {
+          isCollection.imageArr = [...isCollection.imageArr, ...imagesArray];
+          await isCollection.save();
+          return res.send({
+            success: true,
+            msg: "Images uploaded",
+            isCollection,
+          });
+        }
+      } else {
+        const collection = await Collection.create({
+          ...req.body,
+          eventId: eventId,
+        });
+        res.send({
+          success: true,
+          msg: "New collection created",
+          collection: collection,
+        });
+      }
+    } else {
+      if (!eventId) {
+        return res.send({ success: false, message: "Cannot find event Id" });
+      }
+      const collection = await Collection.create({
+        ...req.body,
+        eventId: eventId,
+      });
+      res.send({
+        success: true,
+        msg: "New collection created",
+        collection: collection,
+      });
     }
+  } catch (err) {
+    return res.send({ success: false, message: err.message });
+  }
+  // const collection = await Collection.findOne({
+  //   $and: [{ eventId: eventId }, { _id: collectionId }],
+  // });
+  // console.log(collection);
+  // try {
+  //   const { imagesArray } = req.body;
 
-    const event = await Event.findById(eventId);
+  //   if (
+  //     !Array.isArray(imagesArray) ||
+  //     imagesArray.some((image) => typeof image !== "string")
+  //   ) {
+  //     return res.status(400).json({ message: "Invalid imagesArray data" });
+  //   }
 
-    if (!event) {
-      return res.status(404).json({ message: "Event not found" });
-    }
+  //   const event = await Event.findById(eventId);
 
-    event.imagesArray = event.imagesArray.concat(imagesArray);
+  //   if (!event) {
+  //     return res.status(404).json({ message: "Event not found" });
+  //   }
 
-    await event.save();
+  //   event.imagesArray = event.imagesArray.concat(imagesArray);
 
-    return res
-      .status(200)
-      .json({ message: "Images added successfully", data: event });
-  } catch (error) {
-    return res.status(500).json({ message: "Internal Server Error" });
+  //   await event.save();
+
+  //   return res
+  //     .status(200)
+  //     .json({ message: "Images added successfully", data: event });
+  // } catch (error) {
+  //   return res.status(500).json({ message: "Internal Server Error" });
+  // }
+};
+
+const getCollectionsOfEvent = async (req, res) => {
+  const { eventId } = req.params;
+  if (!eventId) {
+    return res.send({ success: false, msg: "cannot find eventId" });
+  }
+  try {
+    const allCollections = await Collection.find({ eventId: eventId });
+    return res.send({
+      success: true,
+      arr: allCollections,
+      length: allCollections.length,
+    });
+  } catch (err) {
+    return res.send({ success: false, msg: err.message });
   }
 };
 
@@ -815,4 +889,5 @@ module.exports = {
   uploadImage,
   getAllImages,
   deleteImagesOfEvent,
+  getCollectionsOfEvent,
 };
