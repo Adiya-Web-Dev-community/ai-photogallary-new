@@ -98,7 +98,7 @@ const Event = () => {
       <div className="show-container">
         {/* {tab === "images" ? <ShowImages event={event} /> : <ShowVideos />} */}
         <ShowImages event={event} />
-      </div>
+      </div>.
       {openLoginModal && <SignupLoginPopup />}
     </div>
   );
