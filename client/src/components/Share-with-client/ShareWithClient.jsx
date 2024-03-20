@@ -86,21 +86,18 @@ const FaceRecognitionGallery = () => {
   //handle save
   const handleSave = async () => {
     try {
-      const res = await axios.put(
-        `/event/${id}`,
-        form,
-        {
-          fullEventAccess: form.fullEventAccess,
-          faceSearchAccess: form.faceSearchAccess,
-          shareViaEmail: form.shareWithCients,
-          emailsArray: clientEmailArr,
-        },
-        {
-          headers: {
-            authorization: token,
-          },
-        }
-      );
+      const res = await axios.put(`/share-with-client/${id}`, {
+        fullEventAccess: form.fullEventAccess,
+        faceSearchAccess: form.faceSearchAccess,
+        shareViaEmail: form.shareWithCients,
+        emailsArray: clientEmailArr,
+      });
+      if (res.data.success) {
+        toast.success(res.data.msg);
+        setForm({ ...form, shareWithCients: false });
+        setClientEmail("");
+        setClientEmailArr([]);
+      }
     } catch (err) {
       console.log(err);
     }
@@ -160,7 +157,7 @@ const FaceRecognitionGallery = () => {
             GENERAL SETTINGS & SHARING OPTIONS
           </h6>
           <div className="r1">
-            <div className="flex justify-between gap-4   m-auto">
+            <div className="flex px-[7rem] gap-[10rem]   m-auto">
               <div className="flex justify-between">
                 <h6 className="text-lg">Full event access</h6>
                 <div>
@@ -182,28 +179,6 @@ const FaceRecognitionGallery = () => {
                     color="primary"
                   />
                 </div>
-              </div>
-              <div className="flex justify-between">
-                <h6 className="text-lg">Client email</h6>
-                <div>
-                  <Switch
-                    checked={form.clientEmail}
-                    onChange={handleChange}
-                    name="clientEmail"
-                    color="primary"
-                  />
-                </div>
-                {/* <div className="flex justify-between ">
-                  <h6>client whats app</h6>
-                  <div>
-                    <Switch
-                      checked={form.fullEventAccess}
-                      onChange={handleChange}
-                      name="fullEventAccess"
-                      color="primary"
-                    />
-                  </div>
-                </div> */}
               </div>
             </div>
           </div>
@@ -290,7 +265,7 @@ const FaceRecognitionGallery = () => {
           </div>
           <div className="flex justify-center ">
             <button
-              className="w-[25%] border-2 border-gray-300 bg-gray-300 shadow-lg rounded-xl font-bold py-2 hover:bg-gray-200 hover:font-black"
+              className="w-[50%] text-md border-2 border-gray-300 bg-gray-300 shadow-lg rounded-xl font-bold py-2 hover:bg-gray-200 px-4"
               onClick={handleSave}
             >
               Save Settings

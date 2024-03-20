@@ -220,13 +220,18 @@ const shareWithClient = async (req, res) => {
           return res.send({ success: false, msg: "images array is invalid" });
         }
         isEvent.emailsArray = emailsArray;
+        await isEvent.save();
+        if (isEvent.emailsArray.length) {
+          isEvent.emailsArray.forEach((email) => {
+            sendEventInfo(email, isEvent);
+          });
+        }
       }
-      await isEvent.save();
-      if (isEvent.emailsArray.length) {
-        isEvent.emailsArray.forEach((email) => {
-          sendEventInfo(email, isEvent);
-        });
-      }
+      return res.send({
+        success: true,
+        msg: "Your setting has been saved successfully",
+        isEvent,
+      });
     }
   } catch (err) {
     return res.send({ success: false, msg: err.message });
