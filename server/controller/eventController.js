@@ -326,9 +326,7 @@ const updateYoutubeLinks = async (req, res) => {
 
 const addImages = async (req, res) => {
   const { eventId, collectionId, imagesArray } = req.body;
-  if (!eventId) {
-    return res.send({ success: false, message: "Cannot find event Id" });
-  }
+
   try {
     if (collectionId) {
       const isCollection = await Collection.findOne({
@@ -364,6 +362,9 @@ const addImages = async (req, res) => {
         });
       }
     } else {
+      if (!eventId) {
+        return res.send({ success: false, message: "Cannot find event Id" });
+      }
       const collection = await Collection.create({
         ...req.body,
         eventId: eventId,
