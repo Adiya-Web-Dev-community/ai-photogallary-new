@@ -58,9 +58,6 @@ function App() {
           {/* 
           <Route path="/gallary/:id" element={<Gallary />} />
           <Route path="/watermaker-setup" element={<SetupWatermark />} />
-         
-          
-      
           <Route
             path="/face-search/event/:id"
             element={<EventAccessForm />}
