@@ -18,5 +18,6 @@ app.use(require("./routes/planRoutes"));
 app.use(require("./routes/eventRoutes"));
 app.use(require("./routes/dashboardRoutes"));
 app.use(require("./routes/requestRoutes"));
+app.use(require("./routes/favourites"));
 
 module.exports = app;

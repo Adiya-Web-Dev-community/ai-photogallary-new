@@ -8,6 +8,7 @@ const generateOTP = require("../helpers/otpHelper.js").generateOTP;
 const {
   eventConfirmation,
   sendEventMails,
+  sendEventInfo,
 } = require("../helpers/emailHelper.js");
 const QRCode = require("qrcode");
 const Jimp = require("jimp");
@@ -193,6 +194,42 @@ const updateEvent = async (req, res) => {
       message: "Failed to update event",
       success: false,
     });
+  }
+};
+
+const shareWithClient = async (req, res) => {
+  const { id } = req.params;
+  if (!id) {
+    return res.send({ success: false, msg: "Cannot find eventId" });
+  }
+
+  const { fullEventAccess, faceSearchAccess, shareViaEmail, emailsArray } =
+    req.body;
+  try {
+    const isEvent = await Event.findOne({ _id: id });
+    if (!isEvent) {
+      return res.send({
+        success: false,
+        msg: "Cannot find event with this id",
+      });
+    } else {
+      (isEvent.fullEventAccess = fullEventAccess),
+        (isEvent.faceSearchAccess = faceSearchAccess);
+      if (shareViaEmail) {
+        if (!Array.isArray(emailsArray)) {
+          return res.send({ success: false, msg: "images array is invalid" });
+        }
+        isEvent.emailsArray = emailsArray;
+      }
+      await isEvent.save();
+      if (isEvent.emailsArray.length) {
+        isEvent.emailsArray.forEach((email) => {
+          sendEventInfo(email, isEvent);
+        });
+      }
+    }
+  } catch (err) {
+    return res.send({ success: false, msg: err.message });
   }
 };
 
@@ -706,28 +743,28 @@ const createNewImageCategory = async (req, res) => {
 };
 
 // Get all images catgeory folders
-const getImagesCategories = async (req, res) => {
-  try {
-    const eventId = req.params.id;
-    const event = await Event.findById(eventId);
-    const eventDirectory = path.join(
-      __dirname,
-      "..",
-      "..",
-      "database",
-      "events",
-      `${event._id}`
-    );
+// const getImagesCategories = async (req, res) => {
+//   try {
+//     const eventId = req.params.id;
+//     const event = await Event.findById(eventId);
+//     const eventDirectory = path.join(
+//       __dirname,
+//       "..",
+//       "..",
+//       "database",
+//       "events",
+//       `${event._id}`
+//     );
 
-    if (!fs.existsSync(eventDirectory)) {
-      return res.status(404).json({ error: "Event directory not found" });
-    }
-    const existingFolders = getFolderNamesInDirectory(eventDirectory);
-    return res.status(200).json({ message: "Category created successfully" });
-  } catch (error) {
-    return res.status(500).json({ error: "Internal Server Error" });
-  }
-};
+//     if (!fs.existsSync(eventDirectory)) {
+//       return res.status(404).json({ error: "Event directory not found" });
+//     }
+//     const existingFolders = getFolderNamesInDirectory(eventDirectory);
+//     return res.status(200).json({ message: "Category created successfully" });
+//   } catch (error) {
+//     return res.status(500).json({ error: "Internal Server Error" });
+//   }
+// };
 
 // Delete Image Category
 const deleteImageCategory = async (req, res) => {
@@ -890,4 +927,5 @@ module.exports = {
   getAllImages,
   deleteImagesOfEvent,
   getCollectionsOfEvent,
+  shareWithClient,
 };

@@ -130,8 +130,57 @@ const eventConfirmation = (email, name, event, qrCode, qrlink) => {
   });
 };
 
+const sendEventInfo = (email, event) => {
+  let transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: process.env.NODEMAILER_EMAIL,
+      pass: process.env.NODEMAILER_PASSWORD,
+    },
+  });
+
+  let mailOptions = {
+    from: process.env.NODEMAILER_EMAIL,
+    to: email,
+    subject: "Ai gallary",
+    text: `
+            Welcome to the Ai Gallary.,
+            Visit the following links to access events
+          `,
+    html: `
+   ${
+     event?.fullEventAccess &&
+     `
+    <p>To get access for full event</p>
+    <img src="${event?.qrCode}" />
+    <p>${event?.link}</p>
+    <p>Pin : ${event?.fullAccessPin}</p>
+    `
+   }
+   ${
+     event?.faceSearchAccess &&
+     `
+   <p>You can checkout your photos by capturing image or uploading image</p>
+   <img src="${event?.faceQrCode}" />
+   <p>${event?.faceSearchLink}</p>
+   <p>Pin : ${event?.faceSearchPin}</p>
+   `
+   }
+    `,
+  };
+
+  transporter.sendMail(mailOptions, function (error, info) {
+    if (error) {
+      return { error: error };
+    } else {
+      return resp.json({ success: true, message: info.response });
+    }
+  });
+};
+
 module.exports = {
   sendOtpMail,
   eventConfirmation,
-  sendEventMails
+  sendEventMails,
+  sendEventInfo
 };

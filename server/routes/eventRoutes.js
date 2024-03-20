@@ -25,8 +25,8 @@ const {
   deleteImageCategory,
   uploadImage,
   getAllImages,
-  deleteImagesOfEvent,
   getCollectionsOfEvent,
+  shareWithClient,
 } = require("../controller/eventController");
 
 const { uploadImg, compressImages } = require("../middleware/imageUpload");
@@ -44,6 +44,8 @@ router.post("/event", middleware, addEvent);
 
 // Update a event
 router.put("/event/:id", middleware, updateEvent);
+
+router.put("/share-with-client/:id", shareWithClient);
 
 // Get a subevent
 
