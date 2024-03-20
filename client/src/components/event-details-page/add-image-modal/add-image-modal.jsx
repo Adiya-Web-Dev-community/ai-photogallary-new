@@ -12,12 +12,22 @@ import { useParams } from "react-router-dom";
 import { Button, Typography, Box } from "@mui/material";
 import CircularProgress from "@mui/material/CircularProgress";
 import PropTypes from "prop-types";
+import WaterMarkController from "../../controller/controller";
 
 const AddImageModal = ({ handleCloseAddImagesModal }) => {
   const [uploadToDB, setUploadToDB] = useState({
     fileSize: 0,
     uploadImage: [],
   });
+  const [watermarkInfo,steWaterMarkInfo] = useState({
+    x:20,
+    y:20,
+    size:100,
+    isActiveWaterMark:false,
+    imgUrl:'https://dummyimage.com/400x400/000/fff.png&text=Dummy+Image',
+    skip:false,
+    }) 
+
 
   const { eventName, eventId } = useParams();
   const inputRef = useRef(null);
@@ -26,13 +36,11 @@ const AddImageModal = ({ handleCloseAddImagesModal }) => {
 
   const token = localStorage.getItem("token");
 
-  const handalePostIMage = async (url) => {
+  const handalePostIMage = async (obj) => {
     await axios
       .post(
         `/event/${eventId}/event-images`,
-        {
-          imagesArray: [url],
-        },
+        obj,
         {
           headers: {
             authorization: token,
@@ -51,19 +59,21 @@ const AddImageModal = ({ handleCloseAddImagesModal }) => {
   const processQueue = async () => {
     if (!processingQueue && requestQueue.current.length > 0) {
       setProcessingQueue(true);
-      const url = requestQueue.current.shift();
-      await handalePostIMage(url);
-      setUploadToDB((prev) => ({
-        ...prev,
-        uploadImage: [...prev.uploadImage, url],
-      }));
+      // const url = requestQueue.current.shift();
+      // await handalePostIMage(url);
+      // setUploadToDB((prev) => ({
+      //   ...prev,
+      //   uploadImage: [...prev.uploadImage, url],
+      // }));
       setProcessingQueue(false);
     }
   };
 
-  // useEffect(() => {
-  //     processQueue();
-  // }, [processingQueue]);
+  
+
+  useEffect(() => {
+      processQueue();
+  }, [processingQueue]);
 
   // const handleFileChange = async (event) => {
   //     const files = event.target.files;
@@ -85,8 +95,7 @@ const AddImageModal = ({ handleCloseAddImagesModal }) => {
   // };
 
   //add watermark
-  const watermarkImage2 =
-    "https://dummyimage.com/400x400/000/fff.png&text=Dummy+Image"; // Path to your watermark image
+ // Path to your watermark image
   const handleFileChange = async (event) => {
     const files = event.target.files;
     setUploadToDB((prev) => ({
@@ -99,18 +108,15 @@ const AddImageModal = ({ handleCloseAddImagesModal }) => {
       try {
         const file = files[i];
         const imgSrc = await readFileAsDataURL(file);
-        const watermarkImageUrl = watermarkImage2;
+        const watermarkImageUrl = watermarkInfo.imgUrl;
         const watermarkImage = await loadImage(watermarkImageUrl);
 
-        const url = await processImageWithWatermark(
+        await processImageWithWatermark(
           imgSrc,
           watermarkImage,
           file
         );
-        // setUploadToDB(prev => ({
-        //     ...prev,
-        //     uploadImage: [...prev.uploadImage, url]
-        // }));
+      
       } catch (error) {
         console.error("Error uploading image:", error);
         // Handle error if needed
@@ -141,6 +147,11 @@ const AddImageModal = ({ handleCloseAddImagesModal }) => {
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d");
 
+    const waterX = Math.round(watermarkInfo.x)/2;
+    const waterY = Math.round(watermarkInfo.y)/2;
+    const watermarkSize = Math.round(watermarkInfo.size);
+
+
     const baseImage = new Image();
     baseImage.crossOrigin = "anonymous"; // Set crossOrigin to avoid tainted canvas
     baseImage.src = imgSrc;
@@ -149,15 +160,28 @@ const AddImageModal = ({ handleCloseAddImagesModal }) => {
         canvas.width = baseImage.width;
         canvas.height = baseImage.height;
         ctx.drawImage(baseImage, 0, 0);
-        const x = canvas.width - watermarkImage.width - 10;
-        const y = canvas.height - watermarkImage.height - 10;
-        ctx.drawImage(watermarkImage, x, y);
+
+        // console.log()
+        // // const x = canvas.width - watermarkImage.width - 10;
+        // // const y = canvas.height - watermarkImage.height - 10;
+
+      
+        // const x = (waterX/100)*canvas.width -((50/100)*canvas.width)
+        // const y = (waterY/100)*canvas.height-((50/100)*canvas.height);
+
+        const x = (waterX / 100) * canvas.width - (watermarkSize);
+        const y = (waterY / 100) * canvas.height - (watermarkSize);
+
+        const watermarkWidth = (watermarkSize / 100) * canvas.width;
+        const aspectRatio = watermarkImage.width / watermarkImage.height;
+        const watermarkHeight = watermarkWidth / aspectRatio;
+        // const watermarkHeight = (50 / 100) * canvas.height;
+
+        ctx.drawImage(watermarkImage, x, y,watermarkWidth,watermarkHeight);
 
         canvas.toBlob(async (blob) => {
           const url = await uploadImage(eventName, blob);
           // console.log(url)
-
-          await handalePostIMage(url); // Wait for the previous request to complete
           setUploadToDB((prev) => ({
             ...prev,
             uploadImage: [...prev.uploadImage, url],
@@ -171,7 +195,21 @@ const AddImageModal = ({ handleCloseAddImagesModal }) => {
     // return url;
   };
 
-  console.log((uploadToDB.uploadImage.length / uploadToDB.fileSize || 0) * 100);
+  // console.log((uploadToDB.uploadImage.length / uploadToDB.fileSize || 0) * 100);
+  // useEffect(async ()=>{
+  //   if(uploadToDB.uploadImage.length){
+  //     await handalePostIMage(
+  //       {
+  //         category: "Added new",
+  //         imagesArr: [uploadToDB.uploadImage.at(-1)]
+  //       }
+  //     ); // Wait for the previous request to complete
+  //   }
+  // },[uploadToDB.uploadImage.length])
+
+ uploadToDB.uploadImage.map((el)=>{
+    console.log(el)
+  })
 
   return (
     <>
@@ -182,7 +220,18 @@ const AddImageModal = ({ handleCloseAddImagesModal }) => {
         x
       </p>
 
-      <div className="add-image-container">
+      
+      <div style={{height:'500px',width:'100%',overflow:'hidden'}}>
+      <div style={{height:'500px',width:'200%',display:'grid',
+          gridTemplateColumns:'50% 50%',position:'relative',
+          left:`${watermarkInfo.skip||watermarkInfo.isActiveWaterMark?'-100%':'0%'}`,
+          transition: 'left 0.5s ease-in-out' 
+      }}>
+  <WaterMarkController
+      watermarkInfo={watermarkInfo}
+      steWaterMarkInfo={steWaterMarkInfo}
+      />
+         <div  style={{display:'flex',justifyContent:'end',flexDirection:'column'}}>
         <input
           ref={inputRef}
           style={{ display: "none" }}
@@ -190,7 +239,7 @@ const AddImageModal = ({ handleCloseAddImagesModal }) => {
           multiple
           onChange={handleFileChange}
         />
-        <section>
+        <Box style={{height:'400px',overflowY:'scroll'}} >
           {uploadToDB.uploadImage.length ? (
             <ul
               className="add-image-ul"
@@ -205,7 +254,9 @@ const AddImageModal = ({ handleCloseAddImagesModal }) => {
               })}
             </ul>
           ) : null}
-        </section>
+        </Box>
+
+        <div style={{display:'flex',justifyContent:'center'}}>
         {(uploadToDB.uploadImage.length / uploadToDB.fileSize || 0) * 100 ===
         100 ? (
           <div style={{ display: "flex" }}>
@@ -233,7 +284,7 @@ const AddImageModal = ({ handleCloseAddImagesModal }) => {
           <Button
             size="large"
             variant="outlined"
-            sx={{ width: "300px", marginTop: "10px" }}
+            sx={{ width: "300px", marginTop: "10px " }}
             onClick={() => {
               inputRef.current.click();
             }}
@@ -247,7 +298,12 @@ const AddImageModal = ({ handleCloseAddImagesModal }) => {
             />
           </Button>
         )}
+        </div>
       </div>
+     
+      </div>
+      </div>
+
     </>
   );
 };

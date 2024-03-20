@@ -5,7 +5,7 @@ const uniqueIdentifier = `image_${Date.now()}_${Math.floor(Math.random() * 10000
 const uploadImage = async (fileName, file) => {
   try {
       // Create a reference to the storage bucket
-      const storageRef = ref(storage, `${fileName.replace(/\s+/g, '')}/${uniqueIdentifier} ${file.name}`);
+      const storageRef = ref(storage, `${fileName}/${uniqueIdentifier} ${file.name}`);
   
       // Upload the file to the storage bucket
       const snapshot = await uploadBytes(storageRef, file);

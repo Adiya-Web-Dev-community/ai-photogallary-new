@@ -157,10 +157,7 @@ const EventDetailsPage = () => {
   const handleOpenAddImagesModal = () => setOpenAddImagesModal(true);
   const handleCloseAddImagesModal = () => setOpenAddImagesModal(false);
 
-  useEffect(() => {
-    getEventDetails();
-    getAllThePostImage();
-  }, []);
+
 
   return (
     <div className="event-form-page-wrapper">
@@ -261,7 +258,7 @@ const EventDetailsPage = () => {
           {/* buttons section */}
           <div className="flex flex-col justify-center items-center gap-3">
             <p className="mt-5">
-              Event Code: <span>{eventDetails.eventCode}</span>
+              Event Code: <span>{eventDetails?.eventCode}</span>
             </p>
 
             <button
