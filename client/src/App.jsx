@@ -25,6 +25,7 @@ import FaceSearch from "./components/face-search/FaceSearch";
 import Display from "./components/display/display";
 import WaterMarkController from "./components/controller/controller";
 import AddImageModal from "./components/event-details-page/add-image-modal/add-image-modal";
+import Favourites from "./components/full-event-access/Favourites";
 
 function App() {
   const [auth, setAuth] = useState("");
@@ -55,6 +56,7 @@ function App() {
           {/* full access */}
           <Route path="/full-event-access/:id" element={<FullEventForm />} />
           <Route path="/show-event-data/:id" element={<Event />} />
+          <Route path="/event/my-favourites/:id" element={<Favourites />} />
           {/* face search */}
           <Route path="/face-search/event/:id" element={<FaceSearch />} />
           {/* 

@@ -1,7 +1,11 @@
 import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import axios from "../../helpers/axios";
+import { MdArrowBackIos } from "react-icons/md";
 
-const Favourites = () => {
+const Favourites = ({ setShowFavourites }) => {
+  const navigate = useNavigate();
+  const { id } = useParams();
   const [token, setToken] = useState(localStorage.getItem("fav-token"));
   const [imagesArray, setImagesArray] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
@@ -42,10 +46,17 @@ const Favourites = () => {
   };
 
   return (
-    <div className="mx-20 h-auto mt-4">
+    <div className="mb-[10rem] h-auto mt-4 w-full">
+      <p
+        className="px-2 flex gap-1 cursor-pointer"
+        onClick={() => setShowFavourites(false)}
+      >
+        <MdArrowBackIos className="mt-1" />
+        <span>BACK</span>
+      </p>
       <h1 className="text-2xl font-bold mb-4">My Favourites</h1>
-      <div className="grid grid-cols-4 gap-2">
-        {imagesArray &&
+      <div className="grid grid-cols-4 gap-2 ">
+        {imagesArray?.length ? (
           imagesArray.map((image, i) => (
             <div key={`${i + 1}`} className="relative group">
               <img
@@ -56,7 +67,12 @@ const Favourites = () => {
                 onClick={() => openModal(image)}
               />
             </div>
-          ))}
+          ))
+        ) : (
+          <p className="mt-5 text-center font-bold text-md text-gray-400">
+            You have not added any images to favourite
+          </p>
+        )}
       </div>
       {modalVisible && (
         <div
