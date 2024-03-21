@@ -452,6 +452,24 @@ const addImages = async (req, res) => {
   // }
 };
 
+const fetchCollectionImage = async (res, resp) => {
+  const { eventId, collectionId } = req.body;
+  try {
+    const isCollection = await Collection.findOne({
+      $and: [{ _id: collectionId }, { eventId, eventId }],
+    });
+    if (isCollection) {
+      return res.send({
+        success: true,
+        msg: "Images fetched successfully",
+        collection: isCollection,
+      });
+    }
+  } catch (err) {
+    return res.send({ success: false, msg: `error: ${err.message}` });
+  }
+};
+
 const getCollectionsOfEvent = async (req, res) => {
   const { eventId } = req.params;
   if (!eventId) {
@@ -933,4 +951,5 @@ module.exports = {
   deleteImagesOfEvent,
   getCollectionsOfEvent,
   shareWithClient,
+  fetchCollectionImage
 };
