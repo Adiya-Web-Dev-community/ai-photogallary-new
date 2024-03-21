@@ -90,11 +90,12 @@ const ShowImages = ({ event }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedImageUrl, setSelectedImageUrl] = useState("");
   const [copied, setCopied] = useState(false);
-  const [activeTab, setActiveTab] = useState("Sangeet1");
+  const [activeTab, setActiveTab] = useState("");
 
   const getImagesCollections = () => {
     axios.get(`/get-all-collections/${id}`).then((res) => {
       setImageData(res.data.arr);
+      setActiveTab(res.data.arr[0]?.name);
       console.log("COLLECTIONS", res.data);
     });
   };
@@ -132,7 +133,7 @@ const ShowImages = ({ event }) => {
           { headers: { Authorization: `${token}` } }
         )
         .then((res) => {
-          // Handle response if needed
+          toast.success("Image added to favourite");
           console.log("Image added to favorites:", res.data);
         })
         .catch((error) => {
@@ -156,7 +157,7 @@ const ShowImages = ({ event }) => {
             <div key={index}>
               <div
                 key={index}
-                className={` pr-16 text-md font-semibold cursor-pointer ${
+                className={` pr-16 text-md font-semibold cursor-pointer select-none ${
                   activeTab === collection.name
                     ? "text-blue-700 font-bold"
                     : "text-gray-500"
@@ -168,7 +169,7 @@ const ShowImages = ({ event }) => {
             </div>
           ))}
       </div>
-      <div className="image-container py-10 mx-20 h-auto ">
+      <div className="image-container py-10 mx-20 min-h-[79vh] ">
         {imageData &&
           imageData.map((collection) => (
             <div
