@@ -145,34 +145,35 @@ const sendEventInfo = (email, event) => {
     subject: "Ai gallary",
     text: `
             Welcome to the Ai Gallary.,
-            Visit the following links to access events
+            
+            Event: ${event?.eventName}
+            Date: ${event?.eventDate}
+            Vanue: ${event?.venue}
+
+            Visit the following links to access event
+            ${
+              event?.fullEventAccess &&
+              ` To get full event access
+                <img src="${event?.qrCode}" alt="Full Event Access QR Code">
+                ${event?.link}
+                Pin : ${event?.fullAccessPin}`
+            },
+
+            ${
+              event?.faceSearchAccess &&
+              ` You can checkout your photos by capturing image or uploading image
+                <img src="${event?.faceQrCode}" alt="Face Search Access QR Code">
+                ${event?.faceSearchLink}
+                Pin : ${event?.faceSearchPin}`
+            }
           `,
-    html: `
-   ${
-     event?.fullEventAccess &&
-     `
-    <p>To get access for full event</p>
-    <img src="${event?.qrCode}" />
-    <p>${event?.link}</p>
-    <p>Pin : ${event?.fullAccessPin}</p>
-    `
-   }
-   ${
-     event?.faceSearchAccess &&
-     `
-   <p>You can checkout your photos by capturing image or uploading image</p>
-   <img src="${event?.faceQrCode}" />
-   <p>${event?.faceSearchLink}</p>
-   <p>Pin : ${event?.faceSearchPin}</p>
-   `
-   }
-    `,
   };
 
   transporter.sendMail(mailOptions, function (error, info) {
     if (error) {
       return { error: error };
     } else {
+      console.log(info.response);
       return resp.json({ success: true, message: info.response });
     }
   });
@@ -182,5 +183,5 @@ module.exports = {
   sendOtpMail,
   eventConfirmation,
   sendEventMails,
-  sendEventInfo
+  sendEventInfo,
 };

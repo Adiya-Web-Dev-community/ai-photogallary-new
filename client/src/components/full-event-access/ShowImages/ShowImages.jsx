@@ -98,7 +98,6 @@ const ShowImages = ({ event }) => {
       setActiveTab(res.data.arr[0]?.name);
       console.log("COLLECTIONS", res.data);
     });
-    // toast.success("Image added to favourite");
   };
 
   useEffect(() => {
