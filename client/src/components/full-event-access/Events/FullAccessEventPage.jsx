@@ -163,7 +163,7 @@ const Event = () => {
   }, [token, loggedIn]);
 
   return (
-    <div className="event-container">
+    <div className="event-container ">
       <div>
         <div className="relative w-full">
           <img

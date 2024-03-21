@@ -169,7 +169,7 @@ const ShowImages = ({ event }) => {
             </div>
           ))}
       </div>
-      <div className="image-container py-10 mx-20 h-auto ">
+      <div className="image-container py-10 mx-20 min-h-[79vh] ">
         {imageData &&
           imageData.map((collection) => (
             <div
