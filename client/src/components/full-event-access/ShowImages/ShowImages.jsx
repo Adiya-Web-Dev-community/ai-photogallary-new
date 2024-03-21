@@ -90,14 +90,15 @@ const ShowImages = ({ event }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedImageUrl, setSelectedImageUrl] = useState("");
   const [copied, setCopied] = useState(false);
-  const [activeTab, setActiveTab] = useState("Sangeet1");
+  const [activeTab, setActiveTab] = useState("");
 
   const getImagesCollections = () => {
     axios.get(`/get-all-collections/${id}`).then((res) => {
       setImageData(res.data.arr);
+      setActiveTab(res.data.arr[0]?.name);
       console.log("COLLECTIONS", res.data);
     });
-    toast.success("Image added to favourite");
+    // toast.success("Image added to favourite");
   };
 
   useEffect(() => {
@@ -133,7 +134,7 @@ const ShowImages = ({ event }) => {
           { headers: { Authorization: `${token}` } }
         )
         .then((res) => {
-          // Handle response if needed
+          toast.success("Image added to favourite");
           console.log("Image added to favorites:", res.data);
         })
         .catch((error) => {
