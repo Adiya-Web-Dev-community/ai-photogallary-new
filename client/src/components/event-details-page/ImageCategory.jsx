@@ -10,7 +10,7 @@ import toast from 'react-hot-toast';
 
 const ImageCategory = ({setCategroyId,setOpenImagesCorousalModal,setSelectedImage}) => {
     const [data,setData] = useState([])
-    const [imagesData,setImagesData] = useState(['Not Found'])
+    const [imagesData,setImagesData] = useState([])
     const [isOpenToCrate,setIsOpenToCreate] = useState(false)
     const [newCollectionName,setNewCollectionName] = useState('')
     const {eventId } = useParams();
@@ -68,7 +68,7 @@ const ImageCategory = ({setCategroyId,setOpenImagesCorousalModal,setSelectedImag
       });
   };
 
-   
+   console.log(imagesData)
   return (
     <Container sx={{display:imagesData.length?'':'grid',gridAutoRows:`${imagesData.length?'':'60px'}`,gap:'2px',background:'#e9e9e9',padding:'20px',borderRadius:'15px',
      gridTemplateColumns:`${imagesData.length?'1fr 1fr 1fr 1fr':'1fr'}`
@@ -123,9 +123,9 @@ const ImageCategory = ({setCategroyId,setOpenImagesCorousalModal,setSelectedImag
           
             :data.map((el,i)=>
               <Card onClick={()=>{
-                setImagesData(el.imageArr?[...el.imageArr]:['Not Found'])
+                setImagesData(el.imageArr?.[0]?[...el.imageArr]:['Not Found'])
                 setCategroyId(el._id)
-                }} key={i} style={{marginTop:'5px',display:'flex',alignItems:'center',padding:'0px 10px',curso:'pointer'}}>
+                }} key={i} style={{marginTop:'5px',display:'flex',alignItems:'center',padding:'0px 10px',cursor:'pointer'}}>
                 <FaFolder style={{marginRight:'15px'}}/>
                 <Typography sx={{fontWeight:'500',fontSize:'15px'}} >{el.name}</Typography> 
                 </Card>
