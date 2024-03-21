@@ -97,7 +97,6 @@ const ShowImages = ({ event }) => {
       setImageData(res.data.arr);
       console.log("COLLECTIONS", res.data);
     });
-    toast.success("Image added to favourite");
   };
 
   useEffect(() => {
