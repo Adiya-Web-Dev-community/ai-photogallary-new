@@ -112,6 +112,7 @@ import copy from "clipboard-copy";
 //icons
 import { CiHeart } from "react-icons/ci";
 import { CiShare2 } from "react-icons/ci";
+import { FaSignOutAlt } from "react-icons/fa";
 //modal
 import SignupLoginPopup from "../SignupLoginPopup";
 import Favourites from "../Favourites";
@@ -125,6 +126,7 @@ const Event = () => {
   const [copied, setCopied] = useState(false);
   const [openLoginModal, setOpenLoginModal] = useState(false);
   const [showFavourites, setShowFavourites] = useState(false);
+  const [loggedIn, setLoggedIN] = useState(false);
 
   useEffect(() => {
     axios.get(`/event/${id}`).then((res) => {
@@ -152,6 +154,14 @@ const Event = () => {
     ? formatEventDate(event.eventDate)
     : "";
 
+  useEffect(() => {
+    if (token) {
+      setLoggedIN(true);
+    } else {
+      setLoggedIN(false);
+    }
+  }, [token, loggedIn]);
+
   return (
     <div className="event-container">
       <div>
@@ -176,7 +186,7 @@ const Event = () => {
         <div className="flex gap-4">
           <section className="flex gap-2 cursor-pointer">
             <CiHeart className="mt-1 text-xl" />
-            {token ? (
+            {loggedIn ? (
               <span onClick={() => setShowFavourites(true)}>My favourites</span>
             ) : (
               <span
@@ -200,10 +210,24 @@ const Event = () => {
               </div>
             )}
           </section>
+          {loggedIn ? (
+            <section
+              className="cursor-pointer "
+              onClick={() => {
+                localStorage.clear("fav-token");
+              }}
+            >
+              <FaSignOutAlt className="mt-1 text-lg" />
+            </section>
+          ) : null}
         </div>
       </div>
       <div className="container">
-        {showFavourites ? <Favourites setShowFavourites={setShowFavourites} /> : <ShowImages event={event} />}
+        {showFavourites ? (
+          <Favourites setShowFavourites={setShowFavourites} />
+        ) : (
+          <ShowImages event={event} />
+        )}
       </div>
       {openLoginModal && (
         <SignupLoginPopup onClose={() => setOpenLoginModal(false)} />
