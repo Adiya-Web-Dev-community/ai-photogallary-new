@@ -157,7 +157,7 @@ const ShowImages = ({ event }) => {
             <div key={index}>
               <div
                 key={index}
-                className={` pr-16 text-md font-semibold cursor-pointer ${
+                className={` pr-16 text-md font-semibold cursor-pointer select-none ${
                   activeTab === collection.name
                     ? "text-blue-700 font-bold"
                     : "text-gray-500"
