@@ -170,9 +170,9 @@ const EventDetailsPage = () => {
         </div>
         <div className="event-form-page-header-rb">
           <h4>{eventName}</h4>
-          <h4>
+          {/* <h4>
             <CiEdit />
-          </h4>
+          </h4> */}
         </div>
       </section>
       <main className="flex gap-2">

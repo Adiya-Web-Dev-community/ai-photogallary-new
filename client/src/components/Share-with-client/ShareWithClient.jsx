@@ -76,7 +76,7 @@ const FaceRecognitionGallery = () => {
   };
   const copyFaceSearchLink = () => {
     setFullAccessLinkCopied(false);
-    copy(eventData?.link);
+    copy(eventData?.faceSearchLink);
     setFaceSearchLinkCopied(true);
     setTimeout(() => {
       setFaceSearchLinkCopied(false);
