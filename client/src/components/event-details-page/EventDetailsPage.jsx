@@ -4,7 +4,7 @@ import { ImBin } from "react-icons/im";
 import { useEffect, useState } from "react";
 import { Modal, Box } from "@mui/material";
 import AddVideoLinkModal from "./add-video-link-modal/add-video-link-modal";
-import axios from "../../helpers/axios";
+import axios from '../../helpers/axios'
 import { useParams, useNavigate } from "react-router-dom";
 import AddImageModal from "./add-image-modal/add-image-modal";
 import AllImagesContainer from "./all-images-container/all-images-container";
@@ -12,51 +12,48 @@ import AllVideosContainer from "./all-videos-container/all-videos-container";
 import UnpublishedImagesContainer from "./unpublished-images-container/unpublished-images-container";
 import { toast } from "react-hot-toast";
 import ImagesCorousal from "./unpublished-images-container/images-corousal/images-corousal";
+import ImageCategory from "./ImageCategory";
 
 const EventDetailsPage = () => {
   const { eventName, eventId } = useParams();
   const token = localStorage.getItem("token");
   const [containerRendering, setContainerRendering] = useState("allImages");
-  const [eventData, setEventData] = useState();
+  const [eventData, setEventData] = useState([]);
   const [isEditData, setIsEditData] = useState({
     isEdit: false,
     data: {},
   });
   const [selectedImage, setSelectedImage] = useState("");
   const [paginationData, setPaginationData] = useState({});
+  const [categoryId,setCategroyId] = useState('')
+
 
   const [allImages, setAllImages] = useState([]);
   const navigate = useNavigate();
 
   //fetch event details
   const [eventDetails, setEventDetails] = useState({});
-  const fetchEventDetails = async () => {
+
+
+  const getData = async (param,callBack)=>{
     try {
-      const resp = await axios.get(`/event/${eventId}`);
+      const resp = await axios.get(param);
       // console.log("data", resp.data.data);
-      setEventDetails(resp.data.data);
+      callBack(resp.data.data);
     } catch (error) {
       console.error("Error fetching event details:", error);
     }
+  }
+
+  const fetchEventDetails = async () => {
+    getData(`/event/${eventId}`,setEventDetails)
   };
+
+
   useEffect(() => {
     fetchEventDetails();
   }, []);
 
-  const getEventDetails = async () => {
-    await axios
-      .get(`/event/${eventId}/youtube-links`, {
-        headers: {
-          authorization: token,
-        },
-      })
-      .then((res) => {
-        // console.log("getEventdetails => ", res.data);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
 
   const handleEventStatus = async () => {
     let Estatus;
@@ -92,7 +89,6 @@ const EventDetailsPage = () => {
   const handleDelete = async () => {
     try {
       const resp = await axios.delete(`/event/${eventId}`);
-      console.log(resp);
       if (resp.data.success) {
         navigate("/all-events-list");
       }
@@ -103,22 +99,10 @@ const EventDetailsPage = () => {
 
   const [pageNo, setPageNo] = useState(paginationData?.currentPage || 1);
 
-  const getAllThePostImage = async (url) => {
-    await axios
-      .get(`/event/${eventId}/event-images?page=${pageNo}`, {
-        headers: {
-          authorization: token,
-        },
-      })
-      .then((res) => {
-        setAllImages(res.data.imagesArray);
-        // console.log("all event images", res.data);
-        setPaginationData(res.data);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+  const getAllThePostImage = async () => {
+    getData(`/event/${eventId}/event-images?page=${pageNo}`,setAllImages)
   };
+ 
   //when page no changes fetch images
   useEffect(() => {
     getAllThePostImage();
@@ -157,14 +141,32 @@ const EventDetailsPage = () => {
   const handleOpenAddImagesModal = () => setOpenAddImagesModal(true);
   const handleCloseAddImagesModal = () => setOpenAddImagesModal(false);
 
+  const getEventDetails = async () => {
+    await axios
+      .get(`/event/${eventId}/youtube-links`, {
+        headers: {
+          authorization: token,
+        },
+      })
+      .then((res) => {
+        console.log(res.data)
+        setEventData(res.data.data )
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
 
+  useEffect(()=>{
+    getEventDetails()
+  },[])
 
   return (
     <div className="event-form-page-wrapper">
       <section className="event-form-page-header">
         <div className="event-form-page-header-lb">
-          <button onClick={handleOpenAddImagesModal}>Upload Images</button>
-          <button onClick={handleOpenVideoLinkModal}>Upload Video Link</button>
+          <button disabled={!categoryId} onClick={handleOpenAddImagesModal}>Upload Images</button>
+          <button  onClick={handleOpenVideoLinkModal}>Upload Video Link</button>
         </div>
         <div className="event-form-page-header-rb">
           <h4>{eventName}</h4>
@@ -204,19 +206,31 @@ const EventDetailsPage = () => {
             </section>
           </div>
           <div className="w-[90%] m-auto">
+             
+              
+
+
+
             <section
               style={{
                 display: containerRendering == "allImages" ? "block" : "none",
               }}
             >
-              <AllImagesContainer
+              {/* <AllImagesContainer
                 eventData={allImages}
                 setSelectedImage={setSelectedImage}
                 setOpenImagesCorousalModal={setOpenImagesCorousalModal}
                 getAllThePostImage={getAllThePostImage}
                 paginationData={paginationData}
                 setPageNo={setPageNo}
-              />
+              /> */}
+
+                  <ImageCategory 
+                  setCategroyId={setCategroyId}
+                  setSelectedImage={setSelectedImage}
+                  setOpenImagesCorousalModal={setOpenImagesCorousalModal}
+
+                  />
             </section>
             <section
               style={{
@@ -224,10 +238,10 @@ const EventDetailsPage = () => {
                   containerRendering == "unpublishedImages" ? "block" : "none",
               }}
             >
-              <UnpublishedImagesContainer
+              {/* <UnpublishedImagesContainer
                 eventData={eventData}
                 getEventDetails={getEventDetails}
-              />
+              /> */}
             </section>
             <section
               style={{
@@ -309,7 +323,8 @@ const EventDetailsPage = () => {
             imgLinkArr={imgLinkArr}
             setImgLinkArr={setImgLinkArr}
             eventData={eventData}
-            getEventDetails={getEventDetails}
+            categoryId={categoryId}
+            // getEventDetails={getEventDetails}
           />
         </Box>
       </Modal>
@@ -320,6 +335,7 @@ const EventDetailsPage = () => {
         open={openVideoLinkModal}
         onClose={() => {
           handleCloseVideoLinkModal();
+          getEventDetails()
           setIsEditData((prev) => ({ ...prev, isEdit: false, data: {} }));
         }}
         aria-labelledby="modal-modal-title"
@@ -362,7 +378,7 @@ const EventDetailsPage = () => {
             handleCloseImagesCorousalModal={handleCloseImagesCorousalModal}
             imagesCorousalArr={imagesCorousalArr}
             setImagesCorousalArr={setImagesCorousalArr}
-            getEventDetails={getEventDetails}
+            // getEventDetails={getEventDetails}
             eventData={eventData}
             imageIndex={imageIndex}
             imgUrl={selectedImage}

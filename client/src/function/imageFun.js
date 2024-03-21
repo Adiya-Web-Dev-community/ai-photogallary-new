@@ -1,11 +1,12 @@
 import {ref, uploadBytes,getDownloadURL } from "firebase/storage";
 import { storage } from "../firebase/firebase";
-const uniqueIdentifier = `image_${Date.now()}_${Math.floor(Math.random() * 10000)}`;
 
-const uploadImage = async (fileName, file) => {
+const uploadImage = async (fileName, file,name) => {
+  const uniqueIdentifier = `image_${Date.now()}_${Math.floor(Math.random() * 10000)}`;
+
   try {
       // Create a reference to the storage bucket
-      const storageRef = ref(storage, `${fileName}/${uniqueIdentifier} ${file.name}`);
+      const storageRef = ref(storage, `${fileName}/${uniqueIdentifier} ${name}`);
   
       // Upload the file to the storage bucket
       const snapshot = await uploadBytes(storageRef, file);

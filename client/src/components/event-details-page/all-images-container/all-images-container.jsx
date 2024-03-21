@@ -11,7 +11,7 @@ const AllImagesContainer = ({
   };
 
   return (
-    <div className="px-2">
+    <div className="px-2 w-full">
       {/* image list */}
 
       {!eventData.length ? (
@@ -21,14 +21,14 @@ const AllImagesContainer = ({
           </h3>
         </div>
       ) : (
-        <div className=" h-[23rem] grid grid-cols-4  gap-4 justify-center items-center space-y-2">
+        <div className=" h-[23rem] grid grid-cols-4 w-full  gap-4 justify-center items-center space-y-2">
           {eventData.map((image, idx) => (
             <img
               key={idx}
               src={image}
               alt="image"
               className="w-[14rem] h-[10rem]"
-              onClick={() => handleImagesOnClick(idx)}
+              onClick={() => handleImagesOnClick(image)}
             />
           ))}
         </div>

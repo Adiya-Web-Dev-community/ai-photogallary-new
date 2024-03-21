@@ -14,7 +14,7 @@ import CircularProgress from "@mui/material/CircularProgress";
 import PropTypes from "prop-types";
 import WaterMarkController from "../../controller/controller";
 
-const AddImageModal = ({ handleCloseAddImagesModal }) => {
+const AddImageModal = ({ handleCloseAddImagesModal,categoryId }) => {
   const [uploadToDB, setUploadToDB] = useState({
     fileSize: 0,
     uploadImage: [],
@@ -31,15 +31,13 @@ const AddImageModal = ({ handleCloseAddImagesModal }) => {
 
   const { eventName, eventId } = useParams();
   const inputRef = useRef(null);
-  const requestQueue = useRef([]);
-  const [processingQueue, setProcessingQueue] = useState(false);
 
   const token = localStorage.getItem("token");
 
   const handalePostIMage = async (obj) => {
     await axios
       .post(
-        `/event/${eventId}/event-images`,
+        `/add-images`,
         obj,
         {
           headers: {
@@ -48,32 +46,36 @@ const AddImageModal = ({ handleCloseAddImagesModal }) => {
         }
       )
       .then((res) => {
-        processQueue();
-        return res;
+        if(res.status===200){
+          setUploadToDB((prev) => 
+          ({...prev,uploadImage: [...prev.uploadImage, obj.imagesArray[0]]})
+       );
+        }
       })
       .catch((error) => {
         console.log(error);
       });
   };
 
-  const processQueue = async () => {
-    if (!processingQueue && requestQueue.current.length > 0) {
-      setProcessingQueue(true);
-      // const url = requestQueue.current.shift();
-      // await handalePostIMage(url);
-      // setUploadToDB((prev) => ({
-      //   ...prev,
-      //   uploadImage: [...prev.uploadImage, url],
-      // }));
-      setProcessingQueue(false);
-    }
-  };
+
+  // const processQueue = async () => {
+  //   if (!processingQueue && requestQueue.current.length > 0) {
+  //     setProcessingQueue(true);
+  //     // const url = requestQueue.current.shift();
+  //     // await handalePostIMage(url);
+  //     // setUploadToDB((prev) => ({
+  //     //   ...prev,
+  //     //   uploadImage: [...prev.uploadImage, url],
+  //     // }));
+  //     setProcessingQueue(false);
+  //   }
+  // };
 
   
 
-  useEffect(() => {
-      processQueue();
-  }, [processingQueue]);
+  // useEffect(() => {
+  //     processQueue();
+  // }, [processingQueue]);
 
   // const handleFileChange = async (event) => {
   //     const files = event.target.files;
@@ -161,13 +163,6 @@ const AddImageModal = ({ handleCloseAddImagesModal }) => {
         canvas.height = baseImage.height;
         ctx.drawImage(baseImage, 0, 0);
 
-        // console.log()
-        // // const x = canvas.width - watermarkImage.width - 10;
-        // // const y = canvas.height - watermarkImage.height - 10;
-
-      
-        // const x = (waterX/100)*canvas.width -((50/100)*canvas.width)
-        // const y = (waterY/100)*canvas.height-((50/100)*canvas.height);
 
         const x = (waterX / 100) * canvas.width - (watermarkSize);
         const y = (waterY / 100) * canvas.height - (watermarkSize);
@@ -180,12 +175,17 @@ const AddImageModal = ({ handleCloseAddImagesModal }) => {
         ctx.drawImage(watermarkImage, x, y,watermarkWidth,watermarkHeight);
 
         canvas.toBlob(async (blob) => {
-          const url = await uploadImage(eventName, blob);
+          const url = await uploadImage(eventName, blob,file.name);
+
+           handalePostIMage({
+        name:'Sangeet4',
+        imagesArray: [url],
+         eventId,
+        collectionId:categoryId
+    }); 
+         
           // console.log(url)
-          setUploadToDB((prev) => ({
-            ...prev,
-            uploadImage: [...prev.uploadImage, url],
-          }));
+         
           resolve(url);
         }, file.type);
       };
@@ -195,21 +195,14 @@ const AddImageModal = ({ handleCloseAddImagesModal }) => {
     // return url;
   };
 
-  // console.log((uploadToDB.uploadImage.length / uploadToDB.fileSize || 0) * 100);
-  // useEffect(async ()=>{
-  //   if(uploadToDB.uploadImage.length){
-  //     await handalePostIMage(
-  //       {
-  //         category: "Added new",
-  //         imagesArr: [uploadToDB.uploadImage.at(-1)]
-  //       }
-  //     ); // Wait for the previous request to complete
-  //   }
-  // },[uploadToDB.uploadImage.length])
+  useEffect( ()=>{
+    if(uploadToDB.uploadImage.length){
 
- uploadToDB.uploadImage.map((el)=>{
-    console.log(el)
-  })
+      // Wait for the previous request to complete 
+    }
+  },[uploadToDB.uploadImage.length])
+
+
 
   return (
     <>
