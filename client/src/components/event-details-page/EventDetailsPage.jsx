@@ -4,7 +4,7 @@ import { ImBin } from "react-icons/im";
 import { useEffect, useState } from "react";
 import { Modal, Box } from "@mui/material";
 import AddVideoLinkModal from "./add-video-link-modal/add-video-link-modal";
-import axios from '../../helpers/axios'
+import axios from "../../helpers/axios";
 import { useParams, useNavigate } from "react-router-dom";
 import AddImageModal from "./add-image-modal/add-image-modal";
 import AllImagesContainer from "./all-images-container/all-images-container";
@@ -13,6 +13,7 @@ import UnpublishedImagesContainer from "./unpublished-images-container/unpublish
 import { toast } from "react-hot-toast";
 import ImagesCorousal from "./unpublished-images-container/images-corousal/images-corousal";
 import ImageCategory from "./ImageCategory";
+import FavouritsDashboard from "../favourits-dashboard/FavouritsDashboard";
 
 const EventDetailsPage = () => {
   const { eventName, eventId } = useParams();
@@ -25,8 +26,7 @@ const EventDetailsPage = () => {
   });
   const [selectedImage, setSelectedImage] = useState("");
   const [paginationData, setPaginationData] = useState({});
-  const [categoryId,setCategroyId] = useState('')
-
+  const [categoryId, setCategroyId] = useState("");
 
   const [allImages, setAllImages] = useState([]);
   const navigate = useNavigate();
@@ -34,8 +34,7 @@ const EventDetailsPage = () => {
   //fetch event details
   const [eventDetails, setEventDetails] = useState({});
 
-
-  const getData = async (param,callBack)=>{
+  const getData = async (param, callBack) => {
     try {
       const resp = await axios.get(param);
       // console.log("data", resp.data.data);
@@ -43,17 +42,15 @@ const EventDetailsPage = () => {
     } catch (error) {
       console.error("Error fetching event details:", error);
     }
-  }
-
-  const fetchEventDetails = async () => {
-    getData(`/event/${eventId}`,setEventDetails)
   };
 
+  const fetchEventDetails = async () => {
+    getData(`/event/${eventId}`, setEventDetails);
+  };
 
   useEffect(() => {
     fetchEventDetails();
   }, []);
-
 
   const handleEventStatus = async () => {
     let Estatus;
@@ -100,9 +97,9 @@ const EventDetailsPage = () => {
   const [pageNo, setPageNo] = useState(paginationData?.currentPage || 1);
 
   const getAllThePostImage = async () => {
-    getData(`/event/${eventId}/event-images?page=${pageNo}`,setAllImages)
+    getData(`/event/${eventId}/event-images?page=${pageNo}`, setAllImages);
   };
- 
+
   //when page no changes fetch images
   useEffect(() => {
     getAllThePostImage();
@@ -149,24 +146,26 @@ const EventDetailsPage = () => {
         },
       })
       .then((res) => {
-        console.log(res.data)
-        setEventData(res.data.data )
+        console.log(res.data);
+        setEventData(res.data.data);
       })
       .catch((err) => {
         console.log(err);
       });
   };
 
-  useEffect(()=>{
-    getEventDetails()
-  },[])
+  useEffect(() => {
+    getEventDetails();
+  }, []);
 
   return (
     <div className="event-form-page-wrapper">
       <section className="event-form-page-header">
         <div className="event-form-page-header-lb">
-          <button disabled={!categoryId} onClick={handleOpenAddImagesModal}>Upload Images</button>
-          <button  onClick={handleOpenVideoLinkModal}>Upload Video Link</button>
+          <button disabled={!categoryId} onClick={handleOpenAddImagesModal}>
+            Upload Images
+          </button>
+          <button onClick={handleOpenVideoLinkModal}>Upload Video Link</button>
         </div>
         <div className="event-form-page-header-rb">
           <h4>{eventName}</h4>
@@ -204,13 +203,22 @@ const EventDetailsPage = () => {
                 VIDEOS
               </button>
             </section>
+            <section>
+              <button
+                onClick={() => setContainerRendering("user-images")}
+                className="px-4 py-0.5 rounded-md font-bold "
+                style={{
+                  backgroundColor:
+                    containerRendering == "user-images"
+                      ? "#f0f0f0"
+                      : "transparent",
+                }}
+              >
+                USER FAVOURITES IMAGES
+              </button>
+            </section>
           </div>
           <div className="w-[90%] m-auto">
-             
-              
-
-
-
             <section
               style={{
                 display: containerRendering == "allImages" ? "block" : "none",
@@ -225,12 +233,23 @@ const EventDetailsPage = () => {
                 setPageNo={setPageNo}
               /> */}
 
-                  <ImageCategory 
-                  setCategroyId={setCategroyId}
-                  setSelectedImage={setSelectedImage}
-                  setOpenImagesCorousalModal={setOpenImagesCorousalModal}
-
-                  />
+              <ImageCategory
+                setCategroyId={setCategroyId}
+                setSelectedImage={setSelectedImage}
+                setOpenImagesCorousalModal={setOpenImagesCorousalModal}
+              />
+            </section>
+            <section
+              style={{
+                display: containerRendering == "user-images" ? "block" : "none",
+              }}
+            >
+              <h2 className="text-lg font-semibold">User Favorite Images</h2>
+              <FavouritsDashboard
+                setCategroyId={setCategroyId}
+                setSelectedImage={setSelectedImage}
+                setOpenImagesCorousalModal={setOpenImagesCorousalModal}
+              />
             </section>
             <section
               style={{
@@ -335,7 +354,7 @@ const EventDetailsPage = () => {
         open={openVideoLinkModal}
         onClose={() => {
           handleCloseVideoLinkModal();
-          getEventDetails()
+          getEventDetails();
           setIsEditData((prev) => ({ ...prev, isEdit: false, data: {} }));
         }}
         aria-labelledby="modal-modal-title"
