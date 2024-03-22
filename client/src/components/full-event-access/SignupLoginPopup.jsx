@@ -1,15 +1,20 @@
 import { useState } from "react";
 import axios from "../../helpers/axios";
+import { useParams } from "react-router-dom";
 
 const SignupLoginPopup = ({ onClose }) => {
+  const { id } = useParams();
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
-
+  console.log("EVENT_ID", id);
   //handle submit
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const resp = await axios.post("/signup-login", { email: email });
+      const resp = await axios.post("/signup-login", {
+        email: email,
+        eventId: id,
+      });
       const { success, msg, token } = resp.data;
       if (success) {
         localStorage.setItem("fav-token", token);

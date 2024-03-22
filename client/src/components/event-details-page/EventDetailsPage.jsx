@@ -13,6 +13,7 @@ import UnpublishedImagesContainer from "./unpublished-images-container/unpublish
 import { toast } from "react-hot-toast";
 import ImagesCorousal from "./unpublished-images-container/images-corousal/images-corousal";
 import ImageCategory from "./ImageCategory";
+import FavouritsDashboard from "../favourits-dashboard/FavouritsDashboard";
 
 const EventDetailsPage = () => {
   const { eventName, eventId } = useParams();
@@ -244,6 +245,11 @@ const EventDetailsPage = () => {
               }}
             >
               <h2 className="text-lg font-semibold">User Favorite Images</h2>
+              <FavouritsDashboard
+                setCategroyId={setCategroyId}
+                setSelectedImage={setSelectedImage}
+                setOpenImagesCorousalModal={setOpenImagesCorousalModal}
+              />
             </section>
             <section
               style={{
