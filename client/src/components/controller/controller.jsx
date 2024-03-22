@@ -3,6 +3,8 @@ import Button from '@mui/material/Button';
 import { Slider, Typography,Box, Card, Input } from '@mui/material';
 import { useEffect, useState,useRef } from 'react';
 import { convertImageToBase64 } from '../../function/function';
+import { IoMdArrowDropup } from "react-icons/io";
+import { GoDotFill } from "react-icons/go";
 
 export default function WaterMarkController({watermarkInfo,steWaterMarkInfo}) {
 
@@ -61,7 +63,22 @@ useEffect(()=>{
 const handaleChange = (e)=>{
     convertImageToBase64(e.target.files[0],setImageUrl)
 }
+
+
+const handalePosition = (name,value)=>{
+  const obj = {
+    top:{bottom:'auto'},
+    left:{right:'auto'},
+    bottom:{top:'auto'},
+    right:{left:'auto'},
+  }
+  console.log(obj[name])
+  steWaterMarkInfo(prev=>({...prev,[name]:value,...obj[name]}))
+}
+
     
+
+console.log(watermarkInfo)
 
   return ( <div style={
             {
@@ -73,16 +90,18 @@ const handaleChange = (e)=>{
         }
           }>
             <div style={{ background: `url(${'https://cdn.firstcry.com/education/2022/04/29104308/555551179.jpg'})`,
-            height:'100%',width:'600px',position:'relative',overflow:'hidden'
+            height:'100%',width:'600px',position:'relative',overflow:'hidden',
         }}>
                  <img
                  style={{
-                    left:`${buttonPosition.x}%`,
-                    top:`${buttonPosition.y}%`,
+                    left:`${watermarkInfo?.isManually?buttonPosition.x+"%":watermarkInfo?.left}`,
+                    top:`${watermarkInfo?.isManually?buttonPosition.y+"%":watermarkInfo?.top}`,
+                    right:`${watermarkInfo?.isManually?'auto':watermarkInfo?.right}`,
+                    bottom:`${watermarkInfo?.isManually?'auto':watermarkInfo?.bottom}`,
                     position:'absolute',
                     width:`${elemntSize.width}%`,
-                    transform:`translate(-50%, -50%)`,
-
+                    transform:watermarkInfo?.isManually?`translate(-50%, -50%)`:`translate(0%,0%)` ,
+                    transition: 'top 0.2s, left 0.2s'
                  }}
                  src={imageUrl}
                  />
@@ -115,18 +134,82 @@ const handaleChange = (e)=>{
       />
         
     </div>
-
+  
            
-<Box sx={{
-                position:'relative',
-                width:'150px',
-            }}>
+
             
+
+<div style={{height:'200px',width:'100%',overflow:'hidden'}}>
+      <div style={{height:'200px',width:'200%',display:'grid',
+          gridTemplateColumns:'50% 50%',position:'relative',
+          left:`${watermarkInfo?.isManually?'-100%':'0%'}`,
+          transition: 'left 0.5s ease-in-out' ,
+          placeContent:'center'
+      }}>
+
+
+<div style={{
+   display:'flex',
+   alignItems:'center',
+   justifyContent:'space-between',
+   flexDirection:'column',
+}}>
+<div style={{display:'grid',
+gridTemplateColumns:`1fr 1fr 1fr`,
+gridTemplateRows:`1fr 1fr 1fr`,
+width:'150px',height:'150px',
+cursor:'pointer',
+}}
+>
+<Box onClick={()=>{handalePosition('top',0)}} sx={{background:'black',gridArea:'1/2/2/3',borderRadius:'5px 5px 0px 0px',display:'grid',placeContent:'center'}}>
+  <IoMdArrowDropup size='25px' style={{
+  color:'white',
+}}/>
+</Box>
+   <Box sx={{background:'black',gridArea:'2/2/3/3',display:'grid',placeContent:'center'}}>
+    <GoDotFill size='50px' style={{color:'white'}} />
+   </Box>
+  <Box onClick={()=>{handalePosition('left',0)}} sx={{background:'black',gridArea:'2/1/3/2',borderRadius:'5px 0px 0px 5px',display:'grid',placeContent:'center'}}>
+  <IoMdArrowDropup size='25px' style={{
+  color:'white',
+  transform:'rotate(-90deg)'
+
+}}/>
+  </Box>
+  <Box onClick={()=>{handalePosition('right',0)}} sx={{background:'black',gridArea:'2/3/3/4',borderRadius:'0px 5px 5px 0px',display:'grid',placeContent:'center'}}>
+  <IoMdArrowDropup size='25px' style={{
+  color:'white',
+  transform:'rotate(90deg)'
+
+}}/>
+  </Box>
+  <Box onClick={()=>{handalePosition('bottom',0)}} sx={{background:'black',gridArea:'3/2/4/3',borderRadius:'0px 0px 5px 5px',display:'grid',placeContent:'center'}}>
+  <IoMdArrowDropup size='25px' style={{
+  color:'white',
+  transform:'rotate(180deg)'
+
+}}/>  
+  </Box>   
+  
+   
+</div>
+<Button variant='contained' onClick={()=>steWaterMarkInfo(prev=>({...prev,isManually:true}))}>Set Menually </Button>
+</div>
+
+
+<div
+style={{
+  display:'flex',
+  alignItems:'center',
+  justifyContent:'space-between',
+  flexDirection:'column',
+}}
+>
 <p style={{display:'flex'}}>
 <sapn style={{width:'50px'}}><b>Y</b> {Math.round(buttonPosition.y)}</sapn>
 <span style={{width:'50px'}}><b>X </b>{Math.round(buttonPosition.x)}</span>
 </p>
-                <div onMouseMove={handleMouseMove}     onClick={()=>setMoved(prev=>!prev)}
+<div onMouseMove={handleMouseMove}     onClick={()=>setMoved(prev=>!prev)}
  id='parent' style={{background:'black',
   padding:'8px',display:'flex',alignItems:'center', height:'100px',width:'100px',
         position:'relative',
@@ -147,6 +230,7 @@ const handaleChange = (e)=>{
 }}
 >
 
+
      <button style={{height:'20px',width:'20px',borderRadius:'100px',
      background:`${moved?'blue':'white'}`,
       left:`${buttonPosition.x}%`,
@@ -159,17 +243,25 @@ const handaleChange = (e)=>{
 
      </button>
 
-</div>
+</div> 
 
-<Button variant='contained' style={{marginTop:'10px'}}
+ <Button variant='contained' style={{marginTop:'10px'}}
 onClick={()=>{
     setButtonPosition({x:50,y:50})
     setElementSize({width:100})
     setMoved(false)
 }}
 >FULL SCREEN</Button>
+</div>
 
-            </Box>
+
+</div>
+</div>
+
+
+
+
+
              <input type='file' onChange={handaleChange} accept='.png' hidden ref={inputRef}/>
             <Button variant='contained' onClick={()=>inputRef.current.click()}>Upload Water Mark IMAGE</Button>
 
@@ -191,10 +283,8 @@ onClick={()=>{
               style={{                
               }}>Skip</Button>
            </div>
-
             </Card>
 
-          
         </div>
   );
 }
