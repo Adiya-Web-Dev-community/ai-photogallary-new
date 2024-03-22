@@ -3,14 +3,17 @@ const jwt = require("jsonwebtoken");
 
 //create account using email or login
 const create_account = async (req, res) => {
-  const { email } = req.body;
+  const { email, eventId } = req.body;
   if (!email) {
     return res.send({ success: false, msg: "Email not required" });
   }
   try {
     const isAccount = await Favourites.findOne({ email: email });
     if (!isAccount) {
-      const newAccount = await Favourites.create(req.body);
+      const newAccount = await Favourites.create({
+        ...req.body,
+        eventId: eventId,
+      });
       const token = jwt.sign({ _id: newAccount._id }, process.env.SECRET_KEY, {
         expiresIn: "1d",
       });
@@ -71,4 +74,27 @@ const fetchFavouriteImages = async (req, res) => {
   }
 };
 
-module.exports = { create_account, add_images, fetchFavouriteImages };
+//fetch users created favourite colllections
+const fetchFavouriteAlbumForPhotograpger = async (req, res) => {
+  const { eventId } = req.params;
+  if (!eventId) {
+    return res.send({ success: false, msg: "Cannot find eventId" });
+  }
+  try {
+    const fetchAlbum = await Favourites.find({ eventId: eventId });
+    return res.send({
+      success: true,
+      data: fetchAlbum,
+      length: fetchAlbum.length,
+    });
+  } catch (err) {
+    return req.send({ success: false, msg: `err:${err.message}` });
+  }
+};
+
+module.exports = {
+  create_account,
+  add_images,
+  fetchFavouriteImages,
+  fetchFavouriteAlbumForPhotograpger,
+};
