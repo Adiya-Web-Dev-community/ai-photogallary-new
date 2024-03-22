@@ -36,6 +36,7 @@ const Signin = () => {
       })
       .catch((err) => {
         console.log(err);
+        toast.error("Email or Password don't Match");
         setSignInBtnActive(false);
       });
     setSignInBtnActive(false);

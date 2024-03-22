@@ -353,10 +353,12 @@ const FaceSearch = () => {
       setImageData(dataURL);
 
       // Stop the video stream
-      videoStream.getTracks().forEach((track) => {
-        track.stop();
-      });
-      setVideoStream(null); // Clearing the video stream
+      if (videoStream) {
+        videoStream.getTracks().forEach((track) => {
+          track.stop();
+        });
+        setVideoStream(null); // Clearing the video stream
+      }
     } else {
       // If camera access is not available, allow uploading an image
       const input = document.createElement("input");
@@ -396,6 +398,8 @@ const FaceSearch = () => {
                 color: "#fff",
               },
             });
+            setStep(3);
+            setShowForm(false);
           }
         })
         .catch((error) => {
@@ -413,7 +417,7 @@ const FaceSearch = () => {
   }, [step, showForm]);
 
   const toggleCaptureMethod = () => {
-    setUploadMode(false); // Reset upload mode when switching capture methods
+    setUploadMode(false);
     setCaptureMethod((prevMethod) =>
       prevMethod === "camera" ? "upload" : "camera"
     );
@@ -432,15 +436,18 @@ const FaceSearch = () => {
       )}
 
       <div className="">
-        <div>
-          <div className="px-12 py-6">
-            <p className="text-xl font-bold">Event Access Form</p>
-            <h2 className="text-xl font-bold underline">{data.eventName}</h2>
-          </div>
-        </div>
         <div className="form-content shadow">
           {showForm && (
             <form onSubmit={handleSubmit}>
+              <div>
+                <div className="px-12 py-6">
+                  <p className="text-xl font-bold">Event Access Form</p>
+                  <h2 className="text-xl font-bold underline">
+                    {data.eventName}
+                  </h2>
+                </div>
+              </div>
+
               <section className="">
                 <div className="flex gap-6">
                   <label htmlFor="firstName" className="font-semibold">
@@ -587,6 +594,14 @@ const FaceSearch = () => {
                   </div>
                 </div>
               )}
+            </div>
+          )}
+          {step === 3 && (
+            <div className="text-center text-2xl font-semibold text-gray-600">
+              <div className="processing-message">
+                <p>We are processing your data.</p>
+              </div>
+              <Display event={data} />
             </div>
           )}
         </div>
