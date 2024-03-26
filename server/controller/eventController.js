@@ -13,6 +13,7 @@ const {
 const QRCode = require("qrcode");
 const Jimp = require("jimp");
 const axios = require("axios");
+const FavouritsCollection = require("../models/favourites.js");
 const Collection = require("../models/collection.js");
 
 // Get all events
@@ -488,10 +489,18 @@ const getCollectionsOfEvent = async (req, res) => {
 };
 
 const deleteImages = async (req, res) => {
+  console.log(req.body);
   try {
-    const eventId = req.params.id;
-    const { imageUrls } = req.body;
+    const { eventId, collectionId, imageUrls } = req.body;
+    console.log(eventId, collectionId);
 
+    const collection = await FavouritsCollection.findOne({
+      $and: [{ _id: collectionId }, { eventId: eventId }],
+    });
+    // res.send(collection);
+    if (!collection) {
+      return res.status(404).json({ message: "collection not found" });
+    }
     if (
       !Array.isArray(imageUrls) ||
       imageUrls.some((url) => typeof url !== "string")
@@ -499,23 +508,17 @@ const deleteImages = async (req, res) => {
       return res.status(400).json({ message: "Invalid imageUrls data" });
     }
 
-    const event = await Event.findById(eventId);
-
-    if (!event) {
-      return res.status(404).json({ message: "Event not found" });
-    }
-
-    event.imagesArray = event.imagesArray.filter(
+    collection.images = collection.images.filter(
       (image) => !imageUrls.includes(image)
     );
 
-    await event.save();
+    await collection.save();
 
     return res
       .status(200)
-      .json({ message: "Images deleted successfully", data: event });
+      .json({ message: "Images deleted successfully", data: collection });
   } catch (error) {
-    return res.status(500).json({ message: "Internal Server Error" });
+    return res.status(500).json({ message: error.message });
   }
 };
 
@@ -951,5 +954,5 @@ module.exports = {
   deleteImagesOfEvent,
   getCollectionsOfEvent,
   shareWithClient,
-  fetchCollectionImage
+  fetchCollectionImage,
 };

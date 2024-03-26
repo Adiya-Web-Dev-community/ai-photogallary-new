@@ -26,8 +26,7 @@ const EventDetailsPage = () => {
   });
   const [selectedImage, setSelectedImage] = useState("");
   const [paginationData, setPaginationData] = useState({});
-  const [categoryId,setCategroyId] = useState('')
-
+  const [categoryId, setCategroyId] = useState("");
 
   const [allImages, setAllImages] = useState([]);
   const navigate = useNavigate();
@@ -148,7 +147,7 @@ const EventDetailsPage = () => {
       })
       .then((res) => {
         console.log(res.data);
-        setEventData(res.data.data);
+        setEventData(res?.data?.data);
       })
       .catch((err) => {
         console.log(err);
@@ -246,11 +245,7 @@ const EventDetailsPage = () => {
               }}
             >
               <h2 className="text-lg font-semibold">User Favorite Images</h2>
-              <FavouritsDashboard
-                setCategroyId={setCategroyId}
-                setSelectedImage={setSelectedImage}
-                setOpenImagesCorousalModal={setOpenImagesCorousalModal}
-              />
+              <FavouritsDashboard />
             </section>
             <section
               style={{
