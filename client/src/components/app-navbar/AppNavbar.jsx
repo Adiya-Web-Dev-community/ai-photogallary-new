@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 const AppNavbar = () => {
   const navigate = useNavigate();
   const handleSignout = () => {
-    localStorage.clear();
+    localStorage.removeItem("token");
     navigate("/");
   };
 

@@ -77,6 +77,7 @@ const DashBoardDetails = () => {
       console.log(response);
     }
     // navigate("/home-page");
+    navigate("/all-events-list");
   };
   console.log(token);
 

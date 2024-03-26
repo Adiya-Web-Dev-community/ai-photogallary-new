@@ -30,11 +30,13 @@ const Signin = () => {
         if (res.data.success) {
           localStorage.setItem("token", res.data.token);
           dispatch(setToken(res.data.token));
+          toast.success("Log In Successfully");
           navigate(`/all-events-list`);
         }
       })
       .catch((err) => {
         console.log(err);
+        toast.error("Email or Password don't Match");
         setSignInBtnActive(false);
       });
     setSignInBtnActive(false);

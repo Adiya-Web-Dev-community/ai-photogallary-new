@@ -27,6 +27,7 @@ const {
   getAllImages,
   getCollectionsOfEvent,
   shareWithClient,
+  fetchCollectionImage,
 } = require("../controller/eventController");
 
 const { uploadImg, compressImages } = require("../middleware/imageUpload");

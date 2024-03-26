@@ -49,13 +49,15 @@ const Favourites = ({ setShowFavourites }) => {
     <div className="mb-[10rem] h-auto mt-4 w-full">
       <div className="mx-20">
         <p
-          className="px-2 flex gap-1 cursor-pointer"
+          className="px-2 flex gap-1 cursor-pointer hover:text-blue-700"
           onClick={() => setShowFavourites(false)}
         >
           <MdArrowBackIos className="mt-1" />
           <span>BACK</span>
         </p>
-        <h1 className="text-2xl font-bold mb-4 mt-4">My Favourites</h1>
+        <h1 className="text-xl font-bold mb-4 mt-4 text-gray-500">
+          My Favourites
+        </h1>
         <div className="grid grid-cols-4 gap-2 ">
           {imagesArray?.length ? (
             imagesArray.map((image, i) => (
