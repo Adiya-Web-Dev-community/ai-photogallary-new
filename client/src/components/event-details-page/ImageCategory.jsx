@@ -102,7 +102,7 @@ const ImageCategory = ({setCategroyId,setOpenImagesCorousalModal,setSelectedImag
         </form>
       </Dialog>
 
-           {!imagesData&&<Box  >
+           {!imagesData[0]&&<Box  >
               <Button sx={{marginLeft:'auto',display:'block'}} variant='contained'
               onClick={()=>{setIsOpenToCreate(true)}}
               >+ Craete New Collection</Button> 

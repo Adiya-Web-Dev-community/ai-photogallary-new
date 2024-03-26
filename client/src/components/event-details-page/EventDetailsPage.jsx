@@ -26,7 +26,8 @@ const EventDetailsPage = () => {
   });
   const [selectedImage, setSelectedImage] = useState("");
   const [paginationData, setPaginationData] = useState({});
-  const [categoryId, setCategroyId] = useState("");
+  const [categoryId,setCategroyId] = useState('')
+
 
   const [allImages, setAllImages] = useState([]);
   const navigate = useNavigate();

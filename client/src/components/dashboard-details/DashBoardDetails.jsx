@@ -19,10 +19,11 @@ const DashBoardDetails = () => {
     companyName: "",
     contactNo: "",
     companyEmail: "",
-    socialLink: [],
+    socialLinks: [],
     companyLogo: "",
     address: "",
   });
+  const [isActiveToGoBack,setActiveToGoBack] = useState(false)
   const [logo, setLogo] = useState("");
 
   // console.log(dummyArray);
@@ -71,6 +72,7 @@ const DashBoardDetails = () => {
     });
     if (response.data.success) {
       toast.success("company dashboard updated successfully");
+      navigate('/all-events-list')
     } else {
       console.log(response);
     }
@@ -87,7 +89,9 @@ const DashBoardDetails = () => {
         },
       });
       if (response.data.success) {
-        setDashboardData({ ...response.data.data[0], socialLink: [] });
+        setDashboardData({ ...response.data.data[0] });
+        setActiveToGoBack(!!response.data.data[0].companyName.trim())
+
       }
     } catch (error) {
       console.log(error);
@@ -110,7 +114,7 @@ const DashBoardDetails = () => {
   const handleChange = (id, field, value) => {
     setDashboardData((prev) => ({
       ...prev,
-      socialLink: prev.socialLink.map((link) => {
+      socialLinks: prev.socialLinks.map((link) => {
         if (link.id === id) {
           return { ...link, [field]: value };
         }
@@ -120,14 +124,14 @@ const DashBoardDetails = () => {
   };
 
   const handleAddLink = () => {
-    const newId = dashboardData.socialLink.length + 1;
+    const newId = dashboardData.socialLinks.length + 1;
     if (newId > 5) {
       return;
     }
     setDashboardData((prev) => ({
       ...prev,
       socialLink: [
-        ...prev.socialLink,
+        ...prev.socialLinks,
         { id: newId, ...{ linkType: "", link: "" } },
       ],
     }));
@@ -136,15 +140,17 @@ const DashBoardDetails = () => {
   const deleteLink = (id) => {
     setDashboardData((prev) => ({
       ...prev,
-      socialLink: prev.socialLink.filter((link) => link.id !== id),
+      socialLinks: prev.socialLinks.filter((link) => link.id !== id),
     }));
   };
 
   return (
     <div className="dashboard-details-wrappper">
-      <h2>Dashboard Settings</h2>
+  
+      <h2 style={{position:'relative'}}>Dashboard Settings
+       {(isActiveToGoBack)&&<Button style={{position:'absolute',left:'0px'}} onClick={()=>{navigate('/all-events-list')}}>Go Back</Button>}
+      </h2>
       <h6>Update your account details, profile and more</h6>
-
       <form
         className="container"
         onSubmit={(e) => {
@@ -159,6 +165,7 @@ const DashBoardDetails = () => {
           name="companyName"
           value={dashboardData.companyName}
           onChange={handleInputs}
+          required
         />
 
         <Box className="company-logo">
@@ -178,6 +185,8 @@ const DashBoardDetails = () => {
           name="contactNo"
           value={dashboardData.contactNo}
           onChange={handleInputs}
+          required
+
         />
 
         <TextField
@@ -188,6 +197,7 @@ const DashBoardDetails = () => {
           value={dashboardData.companyAddress}
           onChange={handleInputs}
           focused={dashboardData?.companyAddress?.trim()}
+          required
         />
 
         {/* <Box className='watermark-wrapper'>
@@ -201,6 +211,7 @@ const DashBoardDetails = () => {
           name="companyEmail"
           value={dashboardData.companyEmail}
           onChange={handleInputs}
+          required
         />
         {/* <TextField
           type="text"
@@ -224,13 +235,16 @@ const DashBoardDetails = () => {
           }}
         >
           {isEdit
-            ? dashboardData.socialLink.map((el) => (
+            ? dashboardData.socialLinks.map((el) => (
                 <a
                   target="blank"
                   style={{
                     padding: "10px",
                     margin: "0px 10px",
                     textDecoration: "none",
+                    display:'flex',
+                    justifyContent:'center',
+                    alignItems:'center'
                   }}
                   href={el.link}
                 >
@@ -238,7 +252,7 @@ const DashBoardDetails = () => {
                   {el.linkType}
                 </a>
               ))
-            : dashboardData.socialLink.map((el) => (
+            : dashboardData.socialLinks.map((el) => (
                 <div key={el.id} style={{ padding: "10px", width: "200px" }}>
                   <TextField
                     value={el.linkType}
@@ -274,7 +288,7 @@ const DashBoardDetails = () => {
               alignItems: "center",
             }}
           >
-            {dashboardData.socialLink.length < 5 && !isEdit && (
+            {dashboardData.socialLinks.length < 5 && !isEdit && (
               <Button
                 onClick={() => {
                   handleAddLink();

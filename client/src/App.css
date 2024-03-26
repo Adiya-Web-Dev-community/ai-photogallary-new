@@ -3,3 +3,8 @@
   margin: 0%;
   box-sizing: border-box;
 }
+button[disabled] {
+  background-color: #cccccc49; /* Grey color as an example */
+  color: #999999; /* Lighter text color */
+  cursor: not-allowed;
+}

@@ -22,10 +22,15 @@ const AddImageModal = ({ handleCloseAddImagesModal,categoryId }) => {
   const [watermarkInfo,steWaterMarkInfo] = useState({
     x:20,
     y:20,
+    left:0,
+    right:0,
+    top:0,
+    bottom:0, 
     size:100,
     isActiveWaterMark:false,
     imgUrl:'https://dummyimage.com/400x400/000/fff.png&text=Dummy+Image',
     skip:false,
+    isManually:false,
     }) 
 
 
@@ -56,6 +61,7 @@ const AddImageModal = ({ handleCloseAddImagesModal,categoryId }) => {
         console.log(error);
       });
   };
+
 
 
   // const processQueue = async () => {
@@ -171,11 +177,25 @@ const AddImageModal = ({ handleCloseAddImagesModal,categoryId }) => {
         const aspectRatio = watermarkImage.width / watermarkImage.height;
         const watermarkHeight = watermarkWidth / aspectRatio;
         // const watermarkHeight = (50 / 100) * canvas.height;
+        if(watermarkImage.isManually){
+          ctx.drawImage(watermarkImage, x, y, watermarkWidth, watermarkHeight);
+        }else if (!(watermarkInfo.left||watermarkInfo.top)) {
+          ctx.drawImage(watermarkImage, 0, 0, watermarkWidth, watermarkHeight);
+        }else if (!(watermarkInfo.right||watermarkInfo.top)) {
+          ctx.drawImage(watermarkImage, canvas.width - watermarkWidth, 0, watermarkWidth, watermarkHeight)
+        }else if (!(watermarkInfo.left||watermarkInfo.bottom)) {
+          ctx.drawImage(watermarkImage, 0, canvas.height - watermarkHeight, watermarkWidth, watermarkHeight);
+        }else if (!(watermarkInfo.right||watermarkInfo.bottom)) {
+          ctx.drawImage(watermarkImage, canvas.width - watermarkWidth, canvas.height - watermarkHeight, watermarkWidth, watermarkHeight);
+        }
 
-        ctx.drawImage(watermarkImage, x, y,watermarkWidth,watermarkHeight);
 
         canvas.toBlob(async (blob) => {
+         const loader = toast.loading(`Uploading ${file.name}`)
+
           const url = await uploadImage(eventName, blob,file.name);
+          toast.success(`Successfully Uploaded ${file.name}`)
+          toast.dismiss(loader)
 
            handalePostIMage({
         name:'Sangeet4',
