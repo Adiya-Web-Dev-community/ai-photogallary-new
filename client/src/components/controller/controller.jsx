@@ -139,8 +139,8 @@ console.log(watermarkInfo)
 
             
 
-<div style={{height:'200px',width:'100%',overflow:'hidden'}}>
-      <div style={{height:'200px',width:'200%',display:'grid',
+<div style={{height:'220px',width:'100%',overflow:'hidden'}}>
+      <div style={{height:'220px',width:'200%',display:'grid',
           gridTemplateColumns:'50% 50%',position:'relative',
           left:`${watermarkInfo?.isManually?'-100%':'0%'}`,
           transition: 'left 0.5s ease-in-out' ,
@@ -245,13 +245,22 @@ style={{
 
 </div> 
 
- <Button variant='contained' style={{marginTop:'10px'}}
+<div
+style={{
+  display:'flex',
+  alignItems:'center',
+  marginTop:'10px'
+}}
+>
+<Button variant='outlined'  sx={{marginRight:'10px'}}  color='error' onClick={()=>steWaterMarkInfo(prev=>({...prev,isManually:false}))}>Go Back</Button>
+<Button variant='contained' 
 onClick={()=>{
     setButtonPosition({x:50,y:50})
     setElementSize({width:100})
     setMoved(false)
 }}
 >FULL SCREEN</Button>
+</div>
 </div>
 
 
