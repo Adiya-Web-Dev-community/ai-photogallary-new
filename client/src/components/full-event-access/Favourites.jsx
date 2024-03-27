@@ -46,7 +46,7 @@ const Favourites = ({ setShowFavourites }) => {
   };
 
   return (
-    <div className="mb-[10rem] h-auto mt-4 w-full">
+    <div className="mb-[10rem] h-auto mt-4 w-full min-h-[70vh]">
       <div className="mx-20">
         <p
           className="px-2 flex gap-1 cursor-pointer hover:text-blue-700"

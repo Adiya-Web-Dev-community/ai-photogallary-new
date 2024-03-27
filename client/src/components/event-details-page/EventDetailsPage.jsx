@@ -26,9 +26,8 @@ const EventDetailsPage = () => {
   });
   const [selectedImage, setSelectedImage] = useState("");
   const [paginationData, setPaginationData] = useState({});
-  const [categoryId,setCategroyId] = useState('')
-
-
+  const [categoryId, setCategroyId] = useState("");
+  console.log("categoryId", categoryId);
   const [allImages, setAllImages] = useState([]);
   const navigate = useNavigate();
 
@@ -148,7 +147,7 @@ const EventDetailsPage = () => {
       })
       .then((res) => {
         console.log(res.data);
-        setEventData(res.data.data);
+        setEventData(res?.data?.data);
       })
       .catch((err) => {
         console.log(err);
@@ -163,9 +162,17 @@ const EventDetailsPage = () => {
     <div className="event-form-page-wrapper">
       <section className="event-form-page-header">
         <div className="event-form-page-header-lb">
-          <button disabled={!categoryId} onClick={handleOpenAddImagesModal}>
+          <button
+            disabled={!categoryId}
+            onClick={() => {
+              if (categoryId) {
+                handleOpenAddImagesModal();
+              }
+            }}
+          >
             Upload Images
           </button>
+
           <button onClick={handleOpenVideoLinkModal}>Upload Video Link</button>
         </div>
         <div className="event-form-page-header-rb">
@@ -235,6 +242,9 @@ const EventDetailsPage = () => {
               /> */}
 
               <ImageCategory
+                setEventData={setEventData}
+                eventId={eventId}
+                categoryId={categoryId}
                 setCategroyId={setCategroyId}
                 setSelectedImage={setSelectedImage}
                 setOpenImagesCorousalModal={setOpenImagesCorousalModal}
@@ -246,11 +256,7 @@ const EventDetailsPage = () => {
               }}
             >
               <h2 className="text-lg font-semibold">User Favorite Images</h2>
-              <FavouritsDashboard
-                setCategroyId={setCategroyId}
-                setSelectedImage={setSelectedImage}
-                setOpenImagesCorousalModal={setOpenImagesCorousalModal}
-              />
+              <FavouritsDashboard />
             </section>
             <section
               style={{
@@ -393,7 +399,7 @@ const EventDetailsPage = () => {
         aria-describedby="modal-modal-description"
         className="create-event-popup-modal"
       >
-        <Box sx={style}>
+        <div className="flex items-center justify-center h-screen">
           <ImagesCorousal
             handleCloseImagesCorousalModal={handleCloseImagesCorousalModal}
             imagesCorousalArr={imagesCorousalArr}
@@ -403,8 +409,9 @@ const EventDetailsPage = () => {
             imageIndex={imageIndex}
             imgUrl={selectedImage}
             setImageIndex={setImageIndex}
+            categoryId={categoryId}
           />
-        </Box>
+        </div>
       </Modal>
       {/* Images Corousal Modal */}
     </div>
