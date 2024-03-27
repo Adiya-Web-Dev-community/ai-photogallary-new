@@ -17,8 +17,11 @@ import {
 import { FaFolder } from "react-icons/fa6";
 import AllImagesContainer from "./all-images-container/all-images-container";
 import toast from "react-hot-toast";
+import { RiDeleteBin6Line } from "react-icons/ri";
 
 const ImageCategory = ({
+  setEventData,
+  categoryId,
   setCategroyId,
   setOpenImagesCorousalModal,
   setSelectedImage,
@@ -81,17 +84,7 @@ const ImageCategory = ({
 
   console.log(imagesData);
   return (
-    <Container
-      sx={{
-        display: imagesData.length ? "" : "grid",
-        gridAutoRows: `${imagesData.length ? "" : "60px"}`,
-        gap: "2px",
-        background: "#e9e9e9",
-        padding: "20px",
-        borderRadius: "15px",
-        gridTemplateColumns: `${imagesData.length ? "1fr 1fr 1fr 1fr" : "1fr"}`,
-      }}
-    >
+    <div className="p-4 bg-stone-200 rounded-lg">
       <Dialog
         open={isOpenToCrate}
         onClose={() => {
@@ -151,15 +144,23 @@ const ImageCategory = ({
 
       {imagesData.length ? (
         <>
-          <Button variant="contained" onClick={() => setImagesData([])}>
+          <Button
+            variant="contained"
+            onClick={() => {
+              setImagesData([]);
+              setCategroyId("");
+            }}
+          >
             Go Back
           </Button>
           {
             <AllImagesContainer
               eventData={imagesData[0] === "Not Found" ? [] : imagesData}
-              setCategroyId={setCategroyId}
+              categoryId={categoryId}
+              eventId={eventId}
               setSelectedImage={setSelectedImage}
               setOpenImagesCorousalModal={setOpenImagesCorousalModal}
+              setImagesData={setImagesData}
             />
           }
         </>
@@ -174,6 +175,7 @@ const ImageCategory = ({
               setCategroyId(el._id);
             }}
             key={i}
+            className="p-3"
             style={{
               marginTop: "5px",
               display: "flex",
@@ -189,7 +191,7 @@ const ImageCategory = ({
           </Card>
         ))
       )}
-    </Container>
+    </div>
   );
 };
 

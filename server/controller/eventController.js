@@ -494,6 +494,39 @@ const deleteImages = async (req, res) => {
     const { eventId, collectionId, imageUrls } = req.body;
     console.log(eventId, collectionId);
 
+    const collection = await Collection.findOne({
+      $and: [{ _id: collectionId }, { eventId: eventId }],
+    });
+    // res.send(collection);
+    if (!collection) {
+      return res.status(404).json({ message: "collection not found" });
+    }
+    if (
+      !Array.isArray(imageUrls) ||
+      imageUrls.some((url) => typeof url !== "string")
+    ) {
+      return res.status(400).json({ message: "Invalid imageUrls data" });
+    }
+
+    collection.imageArr = collection.imageArr.filter(
+      (image) => !imageUrls.includes(image)
+    );
+
+    await collection.save();
+
+    return res
+      .status(200)
+      .json({ message: "Images deleted successfully", data: collection });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+const deleteFavImages = async (req, res) => {
+  console.log(req.body);
+  try {
+    const { eventId, collectionId, imageUrls } = req.body;
+    console.log(eventId, collectionId);
+
     const collection = await FavouritsCollection.findOne({
       $and: [{ _id: collectionId }, { eventId: eventId }],
     });
@@ -940,6 +973,7 @@ module.exports = {
   updateYoutubeLinks,
   deleteYoutubeLinks,
   addImages,
+  deleteFavImages,
   deleteImages,
   getImagesArray,
   addWatermarkInImages,

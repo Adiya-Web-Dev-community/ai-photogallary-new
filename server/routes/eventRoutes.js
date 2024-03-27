@@ -14,6 +14,7 @@ const {
   updateYoutubeLinks,
   deleteYoutubeLinks,
   addImages,
+  deleteFavImages,
   deleteImages,
   getImagesArray,
   addWatermarkInImages,
@@ -87,6 +88,7 @@ router.put(
 );
 
 router.delete("/event/:id/event-images", middleware, deleteImages);
+router.delete("/event/:id/user-favourite-images", middleware, deleteFavImages);
 
 // Client side apis
 router.post("/:eventName/event-access/:id", pinValidate);

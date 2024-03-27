@@ -27,7 +27,7 @@ const EventDetailsPage = () => {
   const [selectedImage, setSelectedImage] = useState("");
   const [paginationData, setPaginationData] = useState({});
   const [categoryId, setCategroyId] = useState("");
-
+  console.log("categoryId", categoryId);
   const [allImages, setAllImages] = useState([]);
   const navigate = useNavigate();
 
@@ -162,9 +162,17 @@ const EventDetailsPage = () => {
     <div className="event-form-page-wrapper">
       <section className="event-form-page-header">
         <div className="event-form-page-header-lb">
-          <button disabled={!categoryId} onClick={handleOpenAddImagesModal}>
+          <button
+            disabled={!categoryId}
+            onClick={() => {
+              if (categoryId) {
+                handleOpenAddImagesModal();
+              }
+            }}
+          >
             Upload Images
           </button>
+
           <button onClick={handleOpenVideoLinkModal}>Upload Video Link</button>
         </div>
         <div className="event-form-page-header-rb">
@@ -234,6 +242,9 @@ const EventDetailsPage = () => {
               /> */}
 
               <ImageCategory
+                setEventData={setEventData}
+                eventId={eventId}
+                categoryId={categoryId}
                 setCategroyId={setCategroyId}
                 setSelectedImage={setSelectedImage}
                 setOpenImagesCorousalModal={setOpenImagesCorousalModal}
@@ -388,7 +399,7 @@ const EventDetailsPage = () => {
         aria-describedby="modal-modal-description"
         className="create-event-popup-modal"
       >
-        <Box sx={style}>
+        <div className="flex items-center justify-center h-screen">
           <ImagesCorousal
             handleCloseImagesCorousalModal={handleCloseImagesCorousalModal}
             imagesCorousalArr={imagesCorousalArr}
@@ -398,8 +409,9 @@ const EventDetailsPage = () => {
             imageIndex={imageIndex}
             imgUrl={selectedImage}
             setImageIndex={setImageIndex}
+            categoryId={categoryId}
           />
-        </Box>
+        </div>
       </Modal>
       {/* Images Corousal Modal */}
     </div>

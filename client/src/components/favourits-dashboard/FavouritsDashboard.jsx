@@ -52,16 +52,19 @@ const FavouritsDashboard = () => {
   const handleDeleteImages = async () => {
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.delete(`/event/${eventId}/event-images`, {
-        headers: {
-          authorization: token,
-        },
-        data: {
-          eventId: eventId,
-          collectionId: selectedFolder._id,
-          imageUrls: selectedImages,
-        },
-      });
+      const response = await axios.delete(
+        `/event/${eventId}/user-favourite-images`,
+        {
+          headers: {
+            authorization: token,
+          },
+          data: {
+            eventId: eventId,
+            collectionId: selectedFolder._id,
+            imageUrls: selectedImages,
+          },
+        }
+      );
       console.log("SELECTED FOLDER", response.data.data);
       setSelectedFolder(response.data.data);
     } catch (error) {
